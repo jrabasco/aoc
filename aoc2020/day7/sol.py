@@ -25,7 +25,7 @@ def possible_containers(bag, acc=set()):
     direct_containers = { bag for bag, qty in backwards_rules.get(bag, []) }
     acc |= direct_containers
     for c in direct_containers:
-        acc |= possible_containers(c)
+        acc |= possible_containers(c, acc)
     return acc
 
 def count_contents(bag):
