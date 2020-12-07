@@ -21,11 +21,12 @@ for line in lines:
         rules[container].append((bag, int(qty)))
         backwards_rules[bag].add((container, int(qty)))
 
-def possible_containers(bag, acc=set()):
+def possible_containers(bag):
+    acc=set()
     direct_containers = { bag for bag, qty in backwards_rules.get(bag, []) }
     acc |= direct_containers
     for c in direct_containers:
-        acc |= possible_containers(c, acc)
+        acc |= possible_containers(c)
     return acc
 
 def count_contents(bag):
