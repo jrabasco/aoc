@@ -1,7 +1,8 @@
-{-# LANGUAGE BangPatterns #-}
+-- {-# LANGUAGE BangPatterns #-}
 import System.IO
-import Data.List
+import Data.List (sort)
 import Data.Function (fix)
+import qualified Data.Map as Map
 
 main = do
     contents <- readFile "input.txt"
@@ -25,40 +26,21 @@ collectDiffs diffs (diff1, diff3)
     | (head diffs) == 3 = collectDiffs (tail diffs) (diff1, (diff3+1))
     | otherwise = collectDiffs (tail diffs) (diff1, diff3)
 
-data Tree a = Tree (Tree a) a (Tree a)
-instance Functor Tree where
-    fmap f (Tree l m r) = Tree (fmap f l) (f m) (fmap f r)
-
-index :: Tree a -> Int -> a
-index (Tree _ m _) 0 = m
-index (Tree l _ r) n = case (n - 1) `divMod` 2 of
-    (q, 0) -> index l q
-    (q, 1) -> index r q
-
-nats :: Tree Int
-nats = go 0 1
-    where
-        go !n !s = Tree (go l s') n (go r s')
-            where
-                l = n + s
-                r = l + s
-                s' = s * 2
-
-
-toList :: Tree a -> [a]
-toList as = map (index as) [0..]
-
-
-countVars :: ([Int] -> Int -> Int) -> [Int] -> Int -> Int
-countVars f jolts end
+countVars :: [Int] -> Map.Map Int Int -> Int -> Int
+countVars jolts memo end
     | end == 0 = 1
-    | otherwise = foldl (\cnt c -> if ((jolts!!end)-(jolts!!c) <= 3) then (cnt + (f jolts c)) else cnt) 0 [0..end-1]
-
-memoize :: ([Int] -> Int -> a) -> [Int] -> (Int -> a)
-memoize f jolts = index (fmap (f jolts) nats)
-
-countVarsMemo :: [Int] -> Int -> Int
-countVarsMemo = fix (memoize . countVars)
+    | otherwise =  case (Map.lookup end memo) of
+        Just count -> count
+        Nothing -> let (_, count) = foldl (\(mem, acc) c ->
+                             case (Map.lookup c mem) of
+                                 Just count -> (mem, acc + count)
+                                 Nothing ->
+                                     if ((jolts!!end)-(jolts!!c) <= 3)
+                                     then let cCount = countVars jolts mem c
+                                              newMem = Map.insert c cCount mem
+                                          in (newMem, acc + cCount)
+                                     else (mem, acc)) (memo, 0) [0..end-1]
+                   in count
 
 part1 :: [Int] -> Int
 part1 joltages = let diffs = (findDiffs (sort joltages) 0)
@@ -68,4 +50,4 @@ part1 joltages = let diffs = (findDiffs (sort joltages) 0)
 part2 :: [Int] -> Int
 part2 joltages = let jolts = sort joltages
                      allJolts = 0:jolts
-                 in countVarsMemo allJolts ((length allJolts)-1)
+                 in countVars allJolts Map.empty ((length allJolts)-1)
