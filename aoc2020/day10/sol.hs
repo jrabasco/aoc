@@ -42,12 +42,22 @@ countVars jolts memo end
                                      else (mem, acc)) (memo, 0) [0..end-1]
                    in count
 
+pathCounts :: [Int] -> Int -> [Int] -> [Int]
+pathCounts rjolts from paths =
+    let start = rjolts!!from
+        newPaths = [ paths!!(n-1) | n <- [1..3], from - n >= 0, (rjolts!!(from-n) - start) <= 3 ]
+        newCount = sum newPaths
+    in newCount : paths
+
 part1 :: [Int] -> Int
 part1 joltages = let diffs = (findDiffs (sort joltages) 0)
                      (diff1, diff3) = collectDiffs diffs (0,1)
                  in diff1*diff3
 
 part2 :: [Int] -> Int
-part2 joltages = let jolts = sort joltages
-                     allJolts = 0:jolts
-                 in countVars allJolts Map.empty ((length allJolts)-1)
+part2 joltages = let mJolt = (maximum joltages) + 3
+                     jolts = sort joltages
+                     allJolts = 0:jolts ++ [mJolt]
+                     paths 0 = [1]
+                     paths i = pathCounts (reverse allJolts) i (paths (i-1))
+                 in  head $ paths ((length allJolts) - 1)
