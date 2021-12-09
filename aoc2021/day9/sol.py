@@ -1,4 +1,5 @@
 #!/usr/bin/python3.8
+from collections import deque
 
 lines = [line.strip() for line in open('input.txt').readlines()]
 
@@ -32,10 +33,10 @@ print(f'Part 1: {res}')
 # BFS to find the size
 def basin_size(x,y):
     visited = {(x,y)}
-    queue = [(x,y)]
+    queue = deque([(x,y)])
 
     while queue:
-        i, j = queue.pop(0)
+        i, j = queue.popleft()
         height = grid[i][j]
         if i < max_i and grid[i+1][j] < 9 and height < grid[i+1][j]:
             queue.append((i+1, j))
