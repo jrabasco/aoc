@@ -1,5 +1,5 @@
 #!/usr/bin/python3.8
-from matrix import Matrix, Vector
+import numpy as np
 from typing import Set, Tuple, Optional, Dict, List
 from collections import deque
 from dataclasses import dataclass
@@ -7,8 +7,8 @@ from dataclasses import dataclass
 @dataclass
 class Scanner:
     tag: int
-    beacons: Set[Vector]
-    pos: Optional[Vector]
+    beacons: List[np.array]
+    pos: Optional[np.array]
 
 bases_lst = [
     [[ 1, 0, 0], [ 0, 1, 0], [ 0, 0, 1]],
@@ -38,10 +38,10 @@ bases_lst = [
 ]
 
 # first base is the one we assume for the first scanner
-BASE0 = Matrix(bases_lst[0])
-bases = {BASE0}
+BASE0 = np.array(bases_lst[0])
+bases = [BASE0]
 for base in bases_lst[1:]:
-    bases.add(Matrix(base))
+    bases.append(np.array(base))
 
 lines = [line.strip() for line in open('input.txt').readlines()]
 scanners = []
@@ -51,13 +51,13 @@ for line in lines:
         continue
     if '---' in line:
         offs += 1
-        scanners.append(Scanner(offs,set(),None))
+        scanners.append(Scanner(offs,[],None))
         continue
-    beacon = Vector([int(nb) for nb in line.split(',')])
-    scanners[offs].beacons.add(beacon)
+    beacon = np.array([int(nb) for nb in line.split(',')])
+    scanners[offs].beacons.append(beacon)
 
-ALL_BEACONS = scanners[0].beacons.copy()
-POS0 = Vector([0,0,0])
+ALL_BEACONS = {tuple(b) for b in scanners[0].beacons}
+POS0 = np.array([0,0,0])
 scanners[0].pos = POS0
 known = deque([scanners[0]])
 
@@ -66,10 +66,7 @@ ROTATED_SCANNERS = dict()
 for sc in scanners[1:]:
     ROTATED_SCANNERS[sc.tag] = []
     for base in bases:
-        if base == BASE0:
-            ROTATED_SCANNERS[sc.tag].append(sc)
-            continue
-        r_beacons = {base*b for b in sc.beacons}
+        r_beacons = [np.matmul(base, b) for b in sc.beacons]
         ROTATED_SCANNERS[sc.tag].append(Scanner(sc.tag, r_beacons, None))
 
 
@@ -79,14 +76,15 @@ for sc in scanners[1:]:
 
 def find_match_and_transform(rotated_scanners: Dict[int, List[Scanner]],
                    known_scanner: Scanner,
-                   unknown_scanner: Scanner) -> Tuple[Matrix, Scanner]:
+                   unknown_scanner: Scanner) -> Tuple[np.array, Scanner]:
     for r_scan in rotated_scanners[unknown_scanner.tag]:
         for v0 in known_scanner.beacons:
             for v1 in r_scan.beacons:
                 # assume v1 == v0
                 sc_pos = v0 - v1
-                new_beacs = {vec + sc_pos for vec in r_scan.beacons}
-                if len(new_beacs.intersection(known_scanner.beacons)) >= 12:
+                new_beacs = [vec + sc_pos for vec in r_scan.beacons]
+                all_beacs = { tuple(b) for b in new_beacs }.intersection({tuple(b) for b in known_scanner.beacons})
+                if len(all_beacs) >= 12:
                     return base, Scanner(unknown_scanner.tag, new_beacs, sc_pos)
 
 while unknown:
@@ -103,7 +101,7 @@ while unknown:
 
         _ , ksc = res
         for v in ksc.beacons:
-            ALL_BEACONS.add(v)
+            ALL_BEACONS.add(tuple(v))
         known.appendleft(ksc)
 
     unknown = still_unknown
@@ -114,7 +112,7 @@ for sc in known:
 print(f'Part 1: {len(ALL_BEACONS)}')
 
 distances = [
-    a.pos.manhattan_distance(b.pos)
+    np.abs(a.pos-b.pos).sum()
     for a in known
     for b in known
     if a.tag != b.tag
