@@ -89,6 +89,9 @@ class Cuboid:
             return False
         return self._from == other._from and self._to == other._to
 
+    def __hash__(self) -> int:
+        return hash(str(self))
+
     def __repr__(self) -> str:
         return (f'Cuboid(x0={self._from.x}, x1={self._to.x},'
                 f'y0={self._from.y}, y1={self._to.y},'

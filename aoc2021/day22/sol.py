@@ -1,65 +1,62 @@
 #!/usr/bin/python3.8
 from framework import Parser, Cuboid
-from typing import List
+from typing import List, Dict
 
 p = Parser('input.txt')
 
 words_and_ints = zip(p.words_by_line(), p.ints_by_line())
-space = []
 
 
-def volume(space: List[Cuboid]):
-    return sum(c.volume() for c in space)
-
-def add_piece(space: List[Cuboid], piece: Cuboid) -> List[Cuboid]:
-    to_add = [piece]
-    for c in space:
-        to_add = [f for nc in to_add for f in nc.minus(c)]
-    return space + to_add
-
-def remove_piece(space: List[Cuboid], piece: Cuboid) -> List[Cuboid]:
-    to_remove = [piece]
-    n_space = []
-    while space:
-        c = space.pop()
-        frags = [c]
-        found = True
-        while found:
-            found = False
-            i = 0
-            l_remove = len(to_remove)
-            l_frags = len(frags)
-            while i < l_remove and not found:
-                rm = to_remove[i]
-                j = 0
-                while j < l_frags and not found:
-                    f = frags[j]
-                    if not f.has_intersect(rm):
-                        j+=1
-                        continue
-
-                    found = True
-                    n_remove = rm.minus(f)
-                    to_remove = to_remove[:i] + to_remove[i+1:] + n_remove
-                    n_frags = f.minus(rm)
-                    frags = frags[:j] + frags[j+1:] + n_frags
-                    j += 1
-                i += 1
-        n_space += frags
-    return n_space
+def volume(space: Dict[Cuboid, int]) -> int:
+    """
+    The value in the dict shows the "intensity" which takes into account
+    the adjustments made necessary by intersections.
+    """
+    return sum(val*c.volume() for c, val in space.items())
 
 part1 = True
+space = {}
+first = True
 for words, ints in words_and_ints:
+    if first:
+        first = False
+        space[Cuboid(*ints)] = 1
+        continue
     max_abs = max(abs(x) for x in ints)
     if max_abs > 50 and part1:
         print(f'Part 1: {volume(space)}')
         part1 = False
     onoff, _, __, ___ = words
     piece = Cuboid(*ints)
-    if onoff == 'on':
-        space = add_piece(space, piece)
+    for cuboid, val in space.copy().items():
+        inter = cuboid.intersect(piece)
+        # remove the intersection:
+        # - val positive, turning on:
+        #   we need to reduce the light level at the intersection to compensate
+        #   for the volume being added twice -> -= val
+        # - val negative, turning on:
+        #   this area was being compensated for being counted twice, we need to
+        #   negate this as we will compensate once for each times the current
+        #   piece will intersect with the pieces that originally produced this
+        #   intersection -> -= val
+        # - val positive, turning off:
+        #   this is simply adding the opposite of val to turn off this
+        #   intersection with the cuboid -> -= val
+        # - val negative, turning off:
+        #   this area was being compensated for being counted twice, we need
+        #   to negate this as we will turn off the lights for each times the
+        #   current piece will intersect with one of the pieces that created
+        #   the intersection -> -= val
 
-    if onoff == 'off':
-        space = remove_piece(space, piece)
+        if inter is not None:
+            if inter not in space:
+                space[inter] = 0
+            space[inter] -= val
+    # After all the adjustments for the intersection, simply add some light
+    #  value to the piece
+    if onoff == "on":
+        if piece not in space:
+            space[piece] = 0
+        space[piece] += 1
 
 print(f'Part 2: {volume(space)}')
