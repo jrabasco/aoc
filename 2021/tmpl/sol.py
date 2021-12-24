@@ -1,4 +1,7 @@
 #!/usr/bin/python3.8
+from framework import Parser
 
-lines = [line.strip() for line in open('input.txt').readlines()]
-print(lines)
+p = Parser('input.txt')
+
+for line in p.lines():
+    print(line)
