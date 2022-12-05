@@ -1,34 +1,34 @@
 package parse
 
 import (
-    "bufio"
-    "os"
+	"bufio"
+	"os"
 )
 
 func GetLines(file string) ([]string, error) {
-    return GetLinesAs[string](file, func(s string) (string, error) {return s, nil})
+	return GetLinesAs[string](file, func(s string) (string, error) { return s, nil })
 }
 
-func GetLinesAs[T any](file string, conv func(string)(T, error)) ([]T, error) {
-    fileIn, err := os.Open(file)
+func GetLinesAs[T any](file string, conv func(string) (T, error)) ([]T, error) {
+	fileIn, err := os.Open(file)
 
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    defer fileIn.Close()
+	defer fileIn.Close()
 
-    fileScanner := bufio.NewScanner(fileIn)
-    fileScanner.Split(bufio.ScanLines)
+	fileScanner := bufio.NewScanner(fileIn)
+	fileScanner.Split(bufio.ScanLines)
 
-    var res []T
+	var res []T
 
-    for fileScanner.Scan() {
-        elm, err := conv(fileScanner.Text())
-        if err != nil {
-            return nil, err
-        }
-        res = append(res, elm)
-    }
-    return res, nil
+	for fileScanner.Scan() {
+		elm, err := conv(fileScanner.Text())
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, elm)
+	}
+	return res, nil
 }

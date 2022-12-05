@@ -1,11 +1,11 @@
 package day4
 
 import (
-    "fmt"
-		"strings"
-		"strconv"
-    "github.com/jrabasco/aoc/2022/framework/parse"
-    "github.com/jrabasco/aoc/2022/framework/utils"
+	"fmt"
+	"github.com/jrabasco/aoc/2022/framework/parse"
+	"github.com/jrabasco/aoc/2022/framework/utils"
+	"strconv"
+	"strings"
 )
 
 type ElfPair struct {

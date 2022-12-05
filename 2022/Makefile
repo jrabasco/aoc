@@ -3,7 +3,10 @@ all: run
 build:
 	go build -o aoc2022
 
-run: build
+format:
+	go fmt ./...
+
+run: format build
 	./aoc2022 $(ARGS)
 	
 init:

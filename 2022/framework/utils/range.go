@@ -2,10 +2,10 @@ package utils
 
 type Range struct {
 	start int
-	end int
+	end   int
 }
 
-var EmptyRange = Range{0,0}
+var EmptyRange = Range{0, 0}
 
 func NewRange(start int, end int) Range {
 	return Range{start, end}
