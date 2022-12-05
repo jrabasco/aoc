@@ -6,6 +6,10 @@ import (
 )
 
 func GetLines(file string) ([]string, error) {
+    return GetLinesAs[string](file, func(s string) (string, error) {return s, nil})
+}
+
+func GetLinesAs[T any](file string, conv func(string)(T, error)) ([]T, error) {
     fileIn, err := os.Open(file)
 
     if err != nil {
@@ -17,10 +21,14 @@ func GetLines(file string) ([]string, error) {
     fileScanner := bufio.NewScanner(fileIn)
     fileScanner.Split(bufio.ScanLines)
 
-    var res []string
+    var res []T
 
     for fileScanner.Scan() {
-        res = append(res, fileScanner.Text())
+        elm, err := conv(fileScanner.Text())
+        if err != nil {
+            return nil, err
+        }
+        res = append(res, elm)
     }
     return res, nil
 }
