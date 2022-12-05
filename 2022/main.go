@@ -6,6 +6,7 @@ import (
     "github.com/jrabasco/aoc/2022/framework/grid"
     "github.com/jrabasco/aoc/2022/day1"
     "github.com/jrabasco/aoc/2022/day2"
+    "github.com/jrabasco/aoc/2022/day3"
 )
 
 type Command map[string]func() int
@@ -14,6 +15,7 @@ var cmds = Command{
     "grid": grid.BasicTest,
     "day1": day1.Solution,
     "day2": day2.Solution,
+    "day3": day3.Solution,
 }
 
 func main() {
