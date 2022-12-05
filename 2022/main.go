@@ -4,26 +4,28 @@ import (
     "os"
     "fmt"
     "github.com/jrabasco/aoc/2022/day1"
+    "github.com/jrabasco/aoc/2022/framework/grid"
 )
 
-type Solutions map[string]func() int
+type Command map[string]func() int
 
-var solutions = Solutions{
+var cmds = Command{
+    "grid": grid.BasicTest,
     "day1": day1.Solution,
 }
 
 func main() {
     if len(os.Args) < 2 {
-        fmt.Println("Not enough arguments, please specify a day.")
+        fmt.Println("Not enough arguments, please specify a day or test.")
         os.Exit(1)
     }
 
-    day := os.Args[1]
+    cmd := os.Args[1]
 
-    if fn, ok := solutions[day]; ok {
+    if fn, ok := cmds[cmd]; ok {
         os.Exit(fn())
     } else {
-        fmt.Printf("Invalid day: %s\n", day)
+        fmt.Printf("Invalid day or test: %s\n", cmd)
         os.Exit(1)
     }
 }

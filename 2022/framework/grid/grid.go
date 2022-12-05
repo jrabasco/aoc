@@ -3,6 +3,7 @@ package grid
 import (
     "fmt"
     "strings"
+    "strconv"
 )
 
 type Point struct {
@@ -157,43 +158,32 @@ func (g Grid[T]) Columns() [][]T {
     return res
 }
 
-func RowAs[T any, S any](g Grid[T], x int, conv func(T)S) []S {
-    res := []S{}
-    for _, elm := range g.Row(x) {
-        res = append(res, conv(elm))
-    }
-    return res
-}
-
-func RowsAs[T any, S any](g Grid[T], conv func(T)S) [][]S {
-    res := [][]S{}
-    for x := 0; x <= g.maxX; x++ {
-        res = append(res, RowAs[T,S](g, x, conv))
-    }
-    return res
-}
-
-func ColumnAs[T any, S any](g Grid[T], y int, conv func(T)S) []S {
-    res := []S{}
-    for x:=0; x <= g.maxX; x++ {
-        res = append(res, conv(g.grid[x][y]))
-    }
-    return res
-}
-
-func ColumnsAs[T any, S any](g Grid[T], conv func(T)S) [][]S {
-    res := [][]S{}
-    for y := 0; y <= g.maxY; y++ {
-        res = append(res, ColumnAs[T,S](g, y, conv))
-    }
-    return res
+func Convert[T any, S any](g Grid[T], conv func(T)S) Grid[S] {
+    return NewGrid[S, T](g.Rows(), conv)
 }
 
 func (g Grid[T]) String() string{
     var lines []string
-    rowsStr := RowsAs[T, string](g, func(elm T) string{return fmt.Sprintf("%v", elm)})
-    for _, line := range rowsStr {
-        lines = append(lines, strings.Join(line, ""))
+    gridStr := Convert[T, string](g, func(elm T) string{return fmt.Sprintf("%v", elm)})
+    for _, row := range gridStr.Rows() {
+        lines = append(lines, strings.Join(row, ""))
     }
     return strings.Join(lines, "\n")
+}
+
+func BasicTest() int {
+    lines := [][]string{
+        []string{"1", "2", "3"},
+        []string{"4", "5", "6"},
+        []string{"7", "8", "9"},
+    }
+    g := NewGrid[int, string](lines, func(s string) int{
+        e, _ := strconv.Atoi(s)
+        return e
+    })
+    t := NewGrid[int, int](g.Columns(), func(e int) int{return e})
+    fmt.Println(g)
+    fmt.Println("-------")
+    fmt.Println(t)
+    return 0
 }
