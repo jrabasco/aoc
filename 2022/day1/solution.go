@@ -3,7 +3,7 @@ package day1
 import (
     "fmt"
     "strconv"
-    "github.com/jrabasco/aoc/2022/framework"
+    "github.com/jrabasco/aoc/2022/framework/parse"
 )
 
 func findPos(top []int64, val int64) int {
@@ -38,8 +38,7 @@ func sum(top []int64) int64 {
 }
 
 func Solution() int {
-    // part 1
-    lines, err := framework.GetLines("day1/input.txt")
+    lines, err := parse.GetLines("day1/input.txt")
 
     if err != nil {
         fmt.Printf("Could not read lines: %s\n", err)

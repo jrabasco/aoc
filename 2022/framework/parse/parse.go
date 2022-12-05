@@ -1,14 +1,9 @@
-package framework
+package parse
 
 import (
     "bufio"
     "os"
-    "fmt"
 )
-
-func SayHello() {
-    fmt.Println("Hello!")
-}
 
 func GetLines(file string) ([]string, error) {
     fileIn, err := os.Open(file)
