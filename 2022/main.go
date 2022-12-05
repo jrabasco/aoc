@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-type Command map[string]func() int
+type Command map[string]func(string) int
 
 var cmds = Command{
 	"grid":  grid.BasicTest,
@@ -31,9 +31,14 @@ func main() {
 	}
 
 	cmd := os.Args[1]
+	part := "all"
+
+	if len(os.Args) > 2 {
+		part = os.Args[2]
+	}
 
 	if fn, ok := cmds[cmd]; ok {
-		os.Exit(fn())
+		os.Exit(fn(part))
 	} else {
 		fmt.Printf("Invalid day or test: %s\n", cmd)
 		os.Exit(1)

@@ -91,29 +91,37 @@ func getMoves(moveLines []string) ([]Move, error) {
 	return moves, nil
 }
 
-func applyMoves1(stacks *[]CrateStack, moves []Move) error {
-	stackN := len(*stacks)
-	for _, move := range moves {
-		if move.from > stackN {
-			return fmt.Errorf("invalid from position: %d", move.from)
+func move1(from *CrateStack, to *CrateStack, qty int) error {
+	for i := 0; i < qty; i++ {
+		crate, err := from.Pop()
+		if err != nil {
+			return err
 		}
-
-		if move.to > stackN {
-			return fmt.Errorf("invalid to position: %d", move.to)
-		}
-		for i := 0; i < move.qty; i++ {
-			// the stacks are 1-indexed
-			crate, err := (*stacks)[move.from-1].Pop()
-			if err != nil {
-				return err
-			}
-			(*stacks)[move.to-1].Push(crate)
-		}
+		to.Push(crate)
 	}
 	return nil
 }
 
-func applyMoves2(stacks *[]CrateStack, moves []Move) error {
+func move2(from *CrateStack, to *CrateStack, qty int) error {
+	// temporary stack to move crates to
+	// will take care of re-ordering
+	var mCrates CrateStack
+	for i := 0; i < qty; i++ {
+		crate, err := from.Pop()
+		if err != nil {
+			return err
+		}
+		mCrates.Push(crate)
+	}
+
+	for !mCrates.Empty() {
+		crate, _ := mCrates.Pop()
+		to.Push(crate)
+	}
+	return nil
+}
+
+func applyMoves(stacks *[]CrateStack, moves []Move, mv func(*CrateStack, *CrateStack, int) error) error {
 	stackN := len(*stacks)
 	for _, move := range moves {
 		if move.from > stackN {
@@ -123,22 +131,10 @@ func applyMoves2(stacks *[]CrateStack, moves []Move) error {
 		if move.to > stackN {
 			return fmt.Errorf("invalid to position: %d", move.to)
 		}
-
-		// temporary stack to move crates to
-		// will take care of re-ordering
-		var mCrates CrateStack
-		for i := 0; i < move.qty; i++ {
-			// the stacks are 1-indexed
-			crate, err := (*stacks)[move.from-1].Pop()
-			if err != nil {
-				return err
-			}
-			mCrates.Push(crate)
-		}
-
-		for !mCrates.Empty() {
-			crate, _ := mCrates.Pop()
-			(*stacks)[move.to-1].Push(crate)
+		// the stacks are 1-indexed
+		err := mv(&(*stacks)[move.from-1], &(*stacks)[move.to-1], move.qty)
+		if err != nil {
+			return err
 		}
 	}
 	return nil
@@ -156,46 +152,48 @@ func extractTops(stacks *[]CrateStack) (string, error) {
 	return tops, nil
 }
 
-func Solution() int {
+func solvePart(part string) int {
 	parsed, err := parse.GetLines("day5/input.txt")
 	if err != nil {
 		fmt.Printf("Failed to parse input : %v\n", err)
 		return 1
 	}
 	crateLines, moveLines := splitCratesMoves(parsed)
-	stacks1 := getStacks(crateLines)
-	// need a copy
-	stacks2 := getStacks(crateLines)
+	stacks := getStacks(crateLines)
 	moves, err := getMoves(moveLines)
 	if err != nil {
 		fmt.Printf("Error parsing moves: %v\n", err)
 		return 1
 	}
 
-	err = applyMoves1(&stacks1, moves)
+	if part == "1" {
+		err = applyMoves(&stacks, moves, move1)
+	} else {
+		err = applyMoves(&stacks, moves, move2)
+	}
+
 	if err != nil {
 		fmt.Printf("Error applying moves: %v\n", err)
 		return 1
 	}
 
-	err = applyMoves2(&stacks2, moves)
-	if err != nil {
-		fmt.Printf("Error applying moves: %v\n", err)
-		return 1
-	}
-
-	part1, err := extractTops(&stacks1)
+	answer, err := extractTops(&stacks)
 	if err != nil {
 		fmt.Println(err)
 		return 1
 	}
-	fmt.Printf("Part 1: %s\n", part1)
-
-	part2, err := extractTops(&stacks2)
-	if err != nil {
-		fmt.Println(err)
-		return 1
-	}
-	fmt.Printf("Part 2: %s\n", part2)
+	fmt.Printf("Part %s: %s\n", part, answer)
 	return 0
+}
+
+func Solution(part string) int {
+	if part != "1" && part != "2" {
+		p1 := solvePart("1")
+		if p1 != 0 {
+			return p1
+		}
+		return solvePart("2")
+	} else {
+		return solvePart(part)
+	}
 }

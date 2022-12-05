@@ -37,7 +37,7 @@ func sum(top []int64) int64 {
 	return res
 }
 
-func Solution() int {
+func Solution(part string) int {
 	lines, err := parse.GetLines("day1/input.txt")
 
 	if err != nil {
@@ -65,8 +65,13 @@ func Solution() int {
 
 	insertInTop(&topThree, curTot)
 
-	fmt.Printf("Part 1: %d\n", topThree[0])
-	fmt.Printf("Part 2: %d\n", sum(topThree))
+	if part != "2" {
+		fmt.Printf("Part 1: %d\n", topThree[0])
+	}
+
+	if part != "1" {
+		fmt.Printf("Part 2: %d\n", sum(topThree))
+	}
 
 	return 0
 }

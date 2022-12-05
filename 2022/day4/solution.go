@@ -54,7 +54,7 @@ func parseRange(s string) (utils.Range, error) {
 	return utils.NewRange(int(start), int(end)), nil
 }
 
-func Solution() int {
+func Solution(part string) int {
 	pairs, err := parse.GetLinesAs[ElfPair]("day4/input.txt", lineAsElfPair)
 	if err != nil {
 		fmt.Printf("Failed to parse input : %v\n", err)
@@ -73,8 +73,13 @@ func Solution() int {
 		}
 	}
 
-	fmt.Printf("Part 1: %d\n", part1)
-	fmt.Printf("Part 2: %d\n", part2)
+	if part != "2" {
+		fmt.Printf("Part 1: %d\n", part1)
+	}
+
+	if part != "1" {
+		fmt.Printf("Part 2: %d\n", part2)
+	}
 
 	return 0
 }

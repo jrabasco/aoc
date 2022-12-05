@@ -39,7 +39,7 @@ func (s Stack[T]) Peek() (T, error) {
 	return s.s[l-1], nil
 }
 
-func TestStack() int {
+func TestStack(e string) int {
 	s := NewStack[int]()
 
 	if !s.Empty() {

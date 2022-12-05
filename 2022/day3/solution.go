@@ -43,34 +43,38 @@ func getPrio(r rune) int {
 	}
 }
 
-func Solution() int {
+func Solution(part string) int {
 	ruckSacks, err := parse.GetLinesAs[Rucksack]("day3/input.txt", makeRucksack)
 	if err != nil {
 		fmt.Printf("Cannot parse input: %v\n", err)
 		return 1
 	}
 
-	// part1
-	part1 := 0
-	for _, r := range ruckSacks {
-		common := r.c1.Intersect(r.c2).Peek()
-		part1 += getPrio(common)
+	if part != "2" {
+		// part1
+		part1 := 0
+		for _, r := range ruckSacks {
+			common := r.c1.Intersect(r.c2).Peek()
+			part1 += getPrio(common)
+		}
+		fmt.Printf("Part 1: %d\n", part1)
 	}
-	fmt.Printf("Part 1: %d\n", part1)
 
-	// part2
-	if len(ruckSacks)%3 != 0 {
-		fmt.Printf("Invalid number of sacks: %d\n", len(ruckSacks))
-		return 1
+	if part != "1" {
+		// part2
+		if len(ruckSacks)%3 != 0 {
+			fmt.Printf("Invalid number of sacks: %d\n", len(ruckSacks))
+			return 1
+		}
+		part2 := 0
+		for i := 0; i < len(ruckSacks)/3; i++ {
+			r1 := ruckSacks[3*i]
+			r2 := ruckSacks[3*i+1]
+			r3 := ruckSacks[3*i+2]
+			common := r1.tot.Intersect(r2.tot).Intersect(r3.tot).Peek()
+			part2 += getPrio(common)
+		}
+		fmt.Printf("Part 2: %d\n", part2)
 	}
-	part2 := 0
-	for i := 0; i < len(ruckSacks)/3; i++ {
-		r1 := ruckSacks[3*i]
-		r2 := ruckSacks[3*i+1]
-		r3 := ruckSacks[3*i+2]
-		common := r1.tot.Intersect(r2.tot).Intersect(r3.tot).Peek()
-		part2 += getPrio(common)
-	}
-	fmt.Printf("Part 2: %d\n", part2)
 	return 0
 }

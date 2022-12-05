@@ -143,20 +143,25 @@ func lToRound2(line string) (Round, error) {
 	return lToRound(line, inferMine)
 }
 
-func Solution() int {
-	var strategy Strategy
-	strategy, err := parse.GetLinesAs[Round]("day2/input.txt", lToRound1)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Part 1: %d\n", strategy.Score())
+func Solution(part string) int {
 
-	var strategy2 Strategy
-	strategy2, err = parse.GetLinesAs[Round]("day2/input.txt", lToRound2)
-	if err != nil {
-		panic(err)
+	if part != "2" {
+		var strategy Strategy
+		strategy, err := parse.GetLinesAs[Round]("day2/input.txt", lToRound1)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Part 1: %d\n", strategy.Score())
 	}
-	fmt.Printf("Part 2: %d\n", strategy2.Score())
+
+	if part != "1" {
+		var strategy2 Strategy
+		strategy2, err := parse.GetLinesAs[Round]("day2/input.txt", lToRound2)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Part 2: %d\n", strategy2.Score())
+	}
 
 	return 0
 }
