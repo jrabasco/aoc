@@ -7,6 +7,7 @@ import (
     "github.com/jrabasco/aoc/2022/day1"
     "github.com/jrabasco/aoc/2022/day2"
     "github.com/jrabasco/aoc/2022/day3"
+    "github.com/jrabasco/aoc/2022/day4"
 )
 
 type Command map[string]func() int
@@ -16,6 +17,7 @@ var cmds = Command{
     "day1": day1.Solution,
     "day2": day2.Solution,
     "day3": day3.Solution,
+    "day4": day4.Solution,
 }
 
 func main() {
