@@ -11,5 +11,6 @@ func Solution() int {
 		fmt.Printf("Failed to parse input : %v\n", err)
 		return 1
 	}
+	fmt.Println(parsed)
 	return 0
 }

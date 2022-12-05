@@ -6,18 +6,22 @@ import (
 	"github.com/jrabasco/aoc/2022/day2"
 	"github.com/jrabasco/aoc/2022/day3"
 	"github.com/jrabasco/aoc/2022/day4"
+	"github.com/jrabasco/aoc/2022/day5"
 	"github.com/jrabasco/aoc/2022/framework/grid"
+	"github.com/jrabasco/aoc/2022/framework/utils"
 	"os"
 )
 
 type Command map[string]func() int
 
 var cmds = Command{
-	"grid": grid.BasicTest,
-	"day1": day1.Solution,
-	"day2": day2.Solution,
-	"day3": day3.Solution,
-	"day4": day4.Solution,
+	"grid":  grid.BasicTest,
+	"stack": utils.TestStack,
+	"day1":  day1.Solution,
+	"day2":  day2.Solution,
+	"day3":  day3.Solution,
+	"day4":  day4.Solution,
+	"day5":  day5.Solution,
 }
 
 func main() {
