@@ -13,6 +13,10 @@ func (s *Set[T]) Add(elm T) {
 	(*s)[elm] = member
 }
 
+func (s *Set[T]) Remove(elm T) {
+	delete(*s, elm)
+}
+
 func (s Set[T]) Contains(elm T) bool {
 	_, exists := s[elm]
 	return exists

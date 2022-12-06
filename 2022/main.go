@@ -7,6 +7,7 @@ import (
 	"github.com/jrabasco/aoc/2022/day3"
 	"github.com/jrabasco/aoc/2022/day4"
 	"github.com/jrabasco/aoc/2022/day5"
+	"github.com/jrabasco/aoc/2022/day6"
 	"github.com/jrabasco/aoc/2022/framework/grid"
 	"github.com/jrabasco/aoc/2022/framework/utils"
 	"os"
@@ -22,6 +23,7 @@ var cmds = Command{
 	"day3":  day3.Solution,
 	"day4":  day4.Solution,
 	"day5":  day5.Solution,
+	"day6":  day6.Solution,
 }
 
 func main() {
