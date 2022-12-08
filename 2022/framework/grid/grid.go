@@ -19,7 +19,8 @@ type Grid[T any] struct {
 	maxY int
 }
 
-func NewGrid[T any, S any](lines [][]S, conv func(S) T) Grid[T] {
+func NewGrid[T any, S any](lines [][]S, conv func(S) (T, error)) (Grid[T], error) {
+	var empty Grid[T]
 	var grid [][]T
 	h := 0
 	w := 0
@@ -36,7 +37,11 @@ func NewGrid[T any, S any](lines [][]S, conv func(S) T) Grid[T] {
 				maxY = y
 				w = y + 1
 			}
-			grid[x] = append(grid[x], conv(item))
+			nitem, err := conv(item)
+			if err != nil {
+				return empty, err
+			}
+			grid[x] = append(grid[x], nitem)
 		}
 	}
 
@@ -46,7 +51,7 @@ func NewGrid[T any, S any](lines [][]S, conv func(S) T) Grid[T] {
 		w:    w,
 		maxX: maxX,
 		maxY: maxY,
-	}
+	}, nil
 }
 
 func (g *Grid[T]) H() int {
@@ -133,38 +138,51 @@ func (g *Grid[T]) Left(x, y int, wrap bool) Point {
 	return Point{x, y - 1}
 }
 
-func (g Grid[T]) Rows() [][]T {
-	return g.grid
-}
-
-func (g Grid[T]) Row(x int) []T {
-	return g.grid[x]
-}
-
-func (g Grid[T]) Column(y int) []T {
-	res := []T{}
+func (g Grid[T]) Rows() [][]*T {
+	res := [][]*T{}
 	for x := 0; x <= g.maxX; x++ {
-		res = append(res, g.grid[x][y])
+		res = append(res, g.Row(x))
 	}
 	return res
 }
 
-func (g Grid[T]) Columns() [][]T {
-	res := [][]T{}
+func (g Grid[T]) RowsCopy() [][]T {
+	return g.grid
+}
+
+func (g Grid[T]) Row(x int) []*T {
+	res := []*T{}
+	for y := 0; y <= g.maxY; y++ {
+		res = append(res, &g.grid[x][y])
+	}
+	return res
+}
+
+func (g Grid[T]) Column(y int) []*T {
+	res := []*T{}
+	for x := 0; x <= g.maxX; x++ {
+		res = append(res, &g.grid[x][y])
+	}
+	return res
+}
+
+func (g Grid[T]) Columns() [][]*T {
+	res := [][]*T{}
 	for y := 0; y <= g.maxY; y++ {
 		res = append(res, g.Column(y))
 	}
 	return res
 }
 
-func Convert[T any, S any](g Grid[T], conv func(T) S) Grid[S] {
-	return NewGrid[S, T](g.Rows(), conv)
+func Convert[T any, S any](g Grid[T], conv func(T) (S, error)) (Grid[S], error) {
+	return NewGrid[S, T](g.RowsCopy(), conv)
 }
 
 func (g Grid[T]) String() string {
 	var lines []string
-	gridStr := Convert[T, string](g, func(elm T) string { return fmt.Sprintf("%v", elm) })
-	for _, row := range gridStr.Rows() {
+	// no error can be returned since the conv function doesn't error
+	gridStr, _ := Convert[T, string](g, func(elm T) (string, error) { return fmt.Sprintf("%v", elm), nil })
+	for _, row := range gridStr.RowsCopy() {
 		lines = append(lines, strings.Join(row, ""))
 	}
 	return strings.Join(lines, "\n")
@@ -176,11 +194,12 @@ func BasicTest(e string) int {
 		[]string{"4", "5", "6"},
 		[]string{"7", "8", "9"},
 	}
-	g := NewGrid[int, string](lines, func(s string) int {
-		e, _ := strconv.Atoi(s)
-		return e
+	g, _ := NewGrid[int, string](lines, func(s string) (int, error) {
+		e, err := strconv.Atoi(s)
+		return e, err
 	})
-	t := NewGrid[int, int](g.Columns(), func(e int) int { return e })
+	// no error can be returned since the conv function doesn't error
+	t, _ := NewGrid[int, *int](g.Columns(), func(e *int) (int, error) { return *e, nil })
 	fmt.Println(g)
 	fmt.Println("-------")
 	fmt.Println(t)
