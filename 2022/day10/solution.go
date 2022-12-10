@@ -5,6 +5,7 @@ import (
 	"github.com/jrabasco/aoc/2022/framework/parse"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Noop struct{}
@@ -144,11 +145,20 @@ func solvePart(part string) int {
 	}
 
 	strengths := []int{}
+	fmt.Println(cpu.crt)
 	for !cpu.Done() {
+		time.Sleep(30 * time.Millisecond)
+		fmt.Printf("\033[A")
+		fmt.Printf("\033[A")
+		fmt.Printf("\033[A")
+		fmt.Printf("\033[A")
+		fmt.Printf("\033[A")
+		fmt.Printf("\033[A")
 		if (cpu.cycle-20)%40 == 0 {
 			strengths = append(strengths, cpu.SignalStrength())
 		}
 		cpu.Tick()
+		fmt.Println(cpu.crt)
 	}
 	res := 0
 	for _, s := range strengths {
