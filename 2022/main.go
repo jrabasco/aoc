@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/jrabasco/aoc/2022/day1"
+	"github.com/jrabasco/aoc/2022/day10"
 	"github.com/jrabasco/aoc/2022/day2"
 	"github.com/jrabasco/aoc/2022/day3"
 	"github.com/jrabasco/aoc/2022/day4"
@@ -30,6 +31,7 @@ var cmds = Command{
 	"day7":  day7.Solution,
 	"day8":  day8.Solution,
 	"day9":  day9.Solution,
+	"day10": day10.Solution,
 }
 
 func main() {
