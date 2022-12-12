@@ -7,8 +7,8 @@ import (
 )
 
 type Point struct {
-	x int
-	y int
+	X int
+	Y int
 }
 
 type Grid[T any] struct {
@@ -19,7 +19,7 @@ type Grid[T any] struct {
 	maxY int
 }
 
-func NewGrid[T any, S any](lines [][]S, conv func(S) (T, error)) (Grid[T], error) {
+func NewGrid[T any, S any](lines [][]S, conv func(S, int, int) (T, error)) (Grid[T], error) {
 	var empty Grid[T]
 	var grid [][]T
 	h := 0
@@ -37,7 +37,7 @@ func NewGrid[T any, S any](lines [][]S, conv func(S) (T, error)) (Grid[T], error
 				maxY = y
 				w = y + 1
 			}
-			nitem, err := conv(item)
+			nitem, err := conv(item, x, y)
 			if err != nil {
 				return empty, err
 			}
@@ -68,6 +68,10 @@ func (g *Grid[T]) MaxX() int {
 
 func (g *Grid[T]) MaxY() int {
 	return g.maxY
+}
+
+func (g *Grid[T]) Get(x, y int) *T {
+	return &g.grid[x][y]
 }
 
 func (g *Grid[T]) Neighbours(x int, y int) []Point {
@@ -174,14 +178,14 @@ func (g Grid[T]) Columns() [][]*T {
 	return res
 }
 
-func Convert[T any, S any](g Grid[T], conv func(T) (S, error)) (Grid[S], error) {
+func Convert[T any, S any](g Grid[T], conv func(T, int, int) (S, error)) (Grid[S], error) {
 	return NewGrid[S, T](g.RowsCopy(), conv)
 }
 
 func (g Grid[T]) String() string {
 	var lines []string
 	// no error can be returned since the conv function doesn't error
-	gridStr, _ := Convert[T, string](g, func(elm T) (string, error) { return fmt.Sprintf("%v", elm), nil })
+	gridStr, _ := Convert[T, string](g, func(elm T, x, y int) (string, error) { return fmt.Sprintf("%v", elm), nil })
 	for _, row := range gridStr.RowsCopy() {
 		lines = append(lines, strings.Join(row, ""))
 	}
@@ -194,12 +198,12 @@ func BasicTest(e string) int {
 		[]string{"4", "5", "6"},
 		[]string{"7", "8", "9"},
 	}
-	g, _ := NewGrid[int, string](lines, func(s string) (int, error) {
+	g, _ := NewGrid[int, string](lines, func(s string, x, y int) (int, error) {
 		e, err := strconv.Atoi(s)
 		return e, err
 	})
 	// no error can be returned since the conv function doesn't error
-	t, _ := NewGrid[int, *int](g.Columns(), func(e *int) (int, error) { return *e, nil })
+	t, _ := NewGrid[int, *int](g.Columns(), func(e *int, x, y int) (int, error) { return *e, nil })
 	fmt.Println(g)
 	fmt.Println("-------")
 	fmt.Println(t)

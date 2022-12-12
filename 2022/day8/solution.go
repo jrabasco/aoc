@@ -126,7 +126,7 @@ func solvePart(part string) int {
 		return 1
 	}
 
-	f, err := grid.NewGrid[Tree, string](parsed, func(cell string) (Tree, error) {
+	f, err := grid.NewGrid[Tree, string](parsed, func(cell string, x, y int) (Tree, error) {
 		h, err := strconv.Atoi(cell)
 		return NewTree(h), err
 	})
