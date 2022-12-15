@@ -1,6 +1,6 @@
 package grid
 
-type SparseGrid[T any] struct {
+type SparseGrid[T comparable] struct {
 	grid  map[Point]T
 	empty T
 	maxX  int
@@ -9,7 +9,7 @@ type SparseGrid[T any] struct {
 	minY  int
 }
 
-func NewSparseGrid[T any](empty T) SparseGrid[T] {
+func NewSparseGrid[T comparable](empty T) SparseGrid[T] {
 	return SparseGrid[T]{map[Point]T{},
 		empty,
 		-9223372036854775808,
@@ -60,4 +60,10 @@ func (g *SparseGrid[T]) Add(x, y int, r T) {
 	}
 
 	g.grid[Point{x, y}] = r
+}
+
+func (g *SparseGrid[T]) MaybeAdd(x, y int, r T) {
+	if g.Get(x, y) == g.empty {
+		g.Add(x, y, r)
+	}
 }
