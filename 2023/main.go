@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/jrabasco/aoc/2023/day1"
+	"github.com/jrabasco/aoc/2023/day2"
 	"github.com/jrabasco/aoc/2023/framework/grid"
 	"github.com/jrabasco/aoc/2023/framework/utils"
 	"os"
@@ -15,6 +16,7 @@ var cmds = Command{
 	"stack": utils.TestStack,
 	"queue": utils.TestQueue,
 	"day1":  day1.Solution,
+	"day2":  day2.Solution,
 }
 
 func main() {
