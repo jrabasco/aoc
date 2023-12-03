@@ -98,6 +98,44 @@ func (g *Grid[T]) Neighbours(x int, y int) []Point {
 	return res
 }
 
+func (g *Grid[T]) DNeighbours(x int, y int) []Point {
+	res := []Point{}
+	if g.h == 0 || g.w == 0 {
+		return res
+	}
+
+	if x < g.maxX {
+		res = append(res, Point{x + 1, y})
+		if y < g.maxY {
+			res = append(res, Point{x + 1, y + 1})
+		}
+
+		if y > 0 {
+			res = append(res, Point{x + 1, y - 1})
+		}
+	}
+
+	if x > 0 {
+		res = append(res, Point{x - 1, y})
+		if y < g.maxY {
+			res = append(res, Point{x - 1, y + 1})
+		}
+
+		if y > 0 {
+			res = append(res, Point{x - 1, y - 1})
+		}
+	}
+
+	if y < g.maxY {
+		res = append(res, Point{x, y + 1})
+	}
+
+	if y > 0 {
+		res = append(res, Point{x, y - 1})
+	}
+	return res
+}
+
 func (g *Grid[T]) Down(x, y int, wrap bool) Point {
 	if x >= g.maxX {
 		if wrap {
