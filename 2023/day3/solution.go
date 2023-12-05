@@ -69,7 +69,7 @@ func getPart(g *grid.Grid[rune], i, j int, parts *Parts) (int, int, bool) {
 	return nb, delta, isPart
 }
 
-func Solution(string) int {
+func Solution() int {
 	parsed, err := parse.GetLinesAs[[]rune]("day3/input.txt",
 		func(s string) ([]rune, error) {
 			res := []rune{}

@@ -230,7 +230,7 @@ func (g Grid[T]) String() string {
 	return strings.Join(lines, "\n")
 }
 
-func BasicTest(e string) int {
+func BasicTest() int {
 	lines := [][]string{
 		[]string{"1", "2", "3"},
 		[]string{"4", "5", "6"},

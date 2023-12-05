@@ -6,38 +6,67 @@ import (
 	"github.com/jrabasco/aoc/2023/day2"
 	"github.com/jrabasco/aoc/2023/day3"
 	"github.com/jrabasco/aoc/2023/day4"
+	"github.com/jrabasco/aoc/2023/day5"
 	"github.com/jrabasco/aoc/2023/framework/grid"
 	"github.com/jrabasco/aoc/2023/framework/utils"
 	"os"
 )
 
-type Command map[string]func(string) int
+type Commands map[string]func() int
 
-var cmds = Command{
+var cmds = Commands{
+	"day1": day1.Solution,
+	"day2": day2.Solution,
+	"day3": day3.Solution,
+	"day4": day4.Solution,
+	"day5": day5.Solution,
+}
+
+var tests = Commands{
 	"grid":  grid.BasicTest,
 	"stack": utils.TestStack,
 	"queue": utils.TestQueue,
-	"day1":  day1.Solution,
-	"day2":  day2.Solution,
-	"day3":  day3.Solution,
-	"day4":  day4.Solution,
 }
 
 func main() {
+	cmd := "all"
 	if len(os.Args) < 2 {
-		fmt.Println("Not enough arguments, please specify a day or test.")
-		os.Exit(1)
+		fmt.Println("Running all solutions...")
+	} else {
+		cmd = os.Args[1]
 	}
 
-	cmd := os.Args[1]
-	part := "all"
-
-	if len(os.Args) > 2 {
-		part = os.Args[2]
-	}
-
-	if fn, ok := cmds[cmd]; ok {
-		os.Exit(fn(part))
+	if cmd == "test" {
+		first := true
+		for name, t := range tests {
+			if !first {
+				fmt.Println()
+			}
+			fmt.Printf("Running %s test...\n", name)
+			res := t()
+			if res != 0 {
+				fmt.Println("NOT OK")
+				os.Exit(res)
+			}
+			first = false
+			fmt.Println("OK")
+		}
+	} else if cmd == "all" {
+		first := true
+		for day, sol := range cmds {
+			if !first {
+				fmt.Println()
+			}
+			fmt.Printf("Running %s:\n", day)
+			res := sol()
+			if res != 0 {
+				fmt.Println("Failed.")
+				os.Exit(res)
+			}
+			first = false
+		}
+	} else if fn, ok := cmds[cmd]; ok {
+		os.Exit(fn())
 	} else {
 		fmt.Printf("Invalid day or test: %s\n", cmd)
 		os.Exit(1)

@@ -37,7 +37,7 @@ func (q Queue[T]) Peek() (T, error) {
 	return q.q[0], nil
 }
 
-func TestQueue(e string) int {
+func TestQueue() int {
 	q := NewQueue[int]()
 
 	if !q.Empty() {
@@ -102,6 +102,5 @@ func TestQueue(e string) int {
 		fmt.Println("Should not be able to dequeue from an empty queue.")
 		return 1
 	}
-	fmt.Println("Queue: ok")
 	return 0
 }

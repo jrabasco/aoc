@@ -39,7 +39,7 @@ func (s Stack[T]) Peek() (T, error) {
 	return s.s[l-1], nil
 }
 
-func TestStack(e string) int {
+func TestStack() int {
 	s := NewStack[int]()
 
 	if !s.Empty() {
@@ -104,6 +104,5 @@ func TestStack(e string) int {
 		fmt.Println("Should not be able to pop from an empty stack.")
 		return 1
 	}
-	fmt.Println("Stack: ok")
 	return 0
 }

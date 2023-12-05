@@ -9,7 +9,7 @@ import (
 	"unicode"
 )
 
-func solvePart(part string) int {
+func Solution() int {
 	parsed, err := parse.GetLines("day1/input.txt")
 	if err != nil {
 		fmt.Printf("Failed to parse input : %v\n", err)
@@ -18,20 +18,18 @@ func solvePart(part string) int {
 
 	res := 0
 
-	if part == "1" {
-		res, err = part1(parsed)
-		if err != nil {
-			fmt.Printf("Part 1 failed with %v\n", err)
-			return 1
-		}
-	} else {
-		res, err = part2(parsed)
-		if err != nil {
-			fmt.Printf("Part 2 failed with %v\n", err)
-			return 1
-		}
+	res, err = part1(parsed)
+	if err != nil {
+		fmt.Printf("Part 1 failed with %v\n", err)
+		return 1
 	}
-	fmt.Printf("Part %s: %d\n", part, res)
+	fmt.Printf("Part 1: %d\n", res)
+	res, err = part2(parsed)
+	if err != nil {
+		fmt.Printf("Part 2 failed with %v\n", err)
+		return 1
+	}
+	fmt.Printf("Part 2: %d\n", res)
 	return 0
 }
 
@@ -111,16 +109,4 @@ func part1(lines []string) (int, error) {
 		tot += val
 	}
 	return tot, nil
-}
-
-func Solution(part string) int {
-	if part != "1" && part != "2" {
-		p1 := solvePart("1")
-		if p1 != 0 {
-			return p1
-		}
-		return solvePart("2")
-	} else {
-		return solvePart(part)
-	}
 }

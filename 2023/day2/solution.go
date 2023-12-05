@@ -76,7 +76,7 @@ func parseGame(gameStr string) (Game, error) {
 	return res, nil
 }
 
-func solvePart(part string) int {
+func Solution() int {
 	parsed, err := parse.GetLinesAs[Game]("day2/input.txt", parseGame)
 	if err != nil {
 		fmt.Printf("Failed to parse input : %v\n", err)
@@ -84,51 +84,38 @@ func solvePart(part string) int {
 	}
 
 	res := 0
-	if part == "1" {
-		for _, game := range parsed {
-			possible := true
-			for _, set := range game.cubeSets {
-				if set.red > 12 || set.green > 13 || set.blue > 14 {
-					possible = false
-				}
-			}
-			if possible {
-				res += game.id
+	for _, game := range parsed {
+		possible := true
+		for _, set := range game.cubeSets {
+			if set.red > 12 || set.green > 13 || set.blue > 14 {
+				possible = false
 			}
 		}
-	} else {
-		for _, game := range parsed {
-			minRed := 0
-			minGreen := 0
-			minBlue := 0
-			for _, set := range game.cubeSets {
-				if set.red > minRed {
-					minRed = set.red
-				}
-
-				if set.green > minGreen {
-					minGreen = set.green
-				}
-
-				if set.blue > minBlue {
-					minBlue = set.blue
-				}
-			}
-			res += minRed * minGreen * minBlue
+		if possible {
+			res += game.id
 		}
 	}
-	fmt.Printf("Part %s: %d\n", part, res)
+	fmt.Printf("Part 1: %d\n", res)
+	res = 0
+	for _, game := range parsed {
+		minRed := 0
+		minGreen := 0
+		minBlue := 0
+		for _, set := range game.cubeSets {
+			if set.red > minRed {
+				minRed = set.red
+			}
+
+			if set.green > minGreen {
+				minGreen = set.green
+			}
+
+			if set.blue > minBlue {
+				minBlue = set.blue
+			}
+		}
+		res += minRed * minGreen * minBlue
+	}
+	fmt.Printf("Part 2: %d\n", res)
 	return 0
-}
-
-func Solution(part string) int {
-	if part != "1" && part != "2" {
-		p1 := solvePart("1")
-		if p1 != 0 {
-			return p1
-		}
-		return solvePart("2")
-	} else {
-		return solvePart(part)
-	}
 }

@@ -66,43 +66,30 @@ func parseCard(line string) (Card, error) {
 	return card, nil
 }
 
-func solvePart(part string) int {
+func Solution() int {
 	cards, err := parse.GetLinesAs[Card]("day4/input.txt", parseCard)
 	if err != nil {
 		fmt.Printf("Failed to parse input : %v\n", err)
 		return 1
 	}
 	res := 0
-	if part == "1" {
-		for _, card := range cards {
-			res += card.value()
-		}
-	} else {
-		copies := make([]int, len(cards))
-		for i, card := range cards {
-			wins := card.wins()
-			adds := copies[i] + 1
-			for j := i + 1; j <= i+wins; j++ {
-				copies[j] += adds
-			}
-		}
-
-		for _, cp := range copies {
-			res += cp + 1
+	for _, card := range cards {
+		res += card.value()
+	}
+	fmt.Printf("Part 1: %d\n", res)
+	res = 0
+	copies := make([]int, len(cards))
+	for i, card := range cards {
+		wins := card.wins()
+		adds := copies[i] + 1
+		for j := i + 1; j <= i+wins; j++ {
+			copies[j] += adds
 		}
 	}
-	fmt.Printf("Part %s: %d\n", part, res)
+
+	for _, cp := range copies {
+		res += cp + 1
+	}
+	fmt.Printf("Part 2: %d\n", res)
 	return 0
-}
-
-func Solution(part string) int {
-	if part != "1" && part != "2" {
-		p1 := solvePart("1")
-		if p1 != 0 {
-			return p1
-		}
-		return solvePart("2")
-	} else {
-		return solvePart(part)
-	}
 }
