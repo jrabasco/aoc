@@ -8,66 +8,20 @@ import (
 	"strings"
 )
 
-type Range struct {
-	start int
-	end   int
-}
-
-func (r Range) has(elm int) bool {
-	return elm >= r.start && elm <= r.end
-}
-
-func (r Range) empty() bool {
-	return r.end < r.start
-}
-
-// returns the range that's in r and an array of ranges outside of it
-func (r Range) split(other Range) (Range, []Range) {
-	res := []Range{}
-	// other is fully contained
-	if r.start <= other.start && other.end <= r.end {
-		return other, res
-	}
-
-	// other's beginning is contained
-	if r.start <= other.start && r.end < other.end {
-		res = append(res, Range{r.end + 1, other.end})
-		return Range{other.start, r.end}, res
-	}
-
-	// other's end is contained
-	if other.start < r.start && other.end >= r.start && other.end <= r.end {
-		res = append(res, Range{other.start, r.start - 1})
-		return Range{r.start, other.end}, res
-	}
-
-	// other contains r
-
-	if other.start < r.start && r.end < other.end {
-		res = append(res, Range{other.start, r.end - 1})
-		res = append(res, Range{r.end + 1, other.end})
-		return Range{r.start, r.end}, res
-	}
-
-	// disjoint
-	res = append(res, other)
-	return Range{0, -1}, res
-}
-
-type Map map[Range]int // map a range to the delta
+type Map map[utils.Range]int // map a range to the delta
 
 func (m Map) findDelta(elm int) int {
 	for rng, delta := range m {
-		if rng.has(elm) {
+		if rng.Contains(elm) {
 			return delta
 		}
 	}
 	return 0
 }
 
-func (m Map) transform(r Range) []Range {
-	res := []Range{}
-	q := utils.NewQueue[Range]()
+func (m Map) transform(r utils.Range) []utils.Range {
+	res := []utils.Range{}
+	q := utils.NewQueue[utils.Range]()
 	q.Enqueue(r)
 
 	for !q.Empty() {
@@ -75,10 +29,10 @@ func (m Map) transform(r Range) []Range {
 		elm, _ := q.Dequeue()
 		foundMatch := false
 		for rng, delta := range m {
-			match, rest := rng.split(elm)
-			if !match.empty() {
+			match, rest := rng.Split(elm)
+			if !match.Empty() {
 				foundMatch = true
-				nElm := Range{match.start + delta, match.end + delta}
+				nElm := utils.NewRange(match.Start()+delta, match.End()+delta)
 				res = append(res, nElm)
 
 				for _, todo := range rest {
@@ -97,12 +51,12 @@ func (m Map) transform(r Range) []Range {
 
 type Almanac struct {
 	seeds      []int
-	seedRanges []Range
+	seedRanges []utils.Range
 	phases     []Map
 }
 
 func parseAlmanac(lines []string) (Almanac, error) {
-	res := Almanac{[]int{}, []Range{}, []Map{}}
+	res := Almanac{[]int{}, []utils.Range{}, []Map{}}
 
 	seedsStr := strings.TrimPrefix(lines[0], "seeds: ")
 	seedsParts := strings.Split(seedsStr, " ")
@@ -115,7 +69,7 @@ func parseAlmanac(lines []string) (Almanac, error) {
 	}
 
 	for i := 0; i < len(res.seeds)/2; i++ {
-		rng := Range{res.seeds[2*i], res.seeds[2*i] + res.seeds[2*i+1] - 1}
+		rng := utils.NewRange(res.seeds[2*i], res.seeds[2*i]+res.seeds[2*i+1]-1)
 		res.seedRanges = append(res.seedRanges, rng)
 	}
 
@@ -154,8 +108,8 @@ func parseMap(start int, lines []string) (Map, int, error) {
 			return res, i, err
 		}
 
-		rng := Range{src, src + ln - 1} // inclusive boundaries
-		res[rng] = dst - src            // delta
+		rng := utils.NewRange(src, src+ln-1) // inclusive boundaries
+		res[rng] = dst - src                 // delta
 		i++
 	}
 	return res, i, nil // i is now at the next empty line
@@ -188,9 +142,9 @@ func Solution() int {
 
 	res = 9223372036854775807
 	for _, seedR := range almanac.seedRanges {
-		curs := []Range{seedR}
+		curs := []utils.Range{seedR}
 		for _, phase := range almanac.phases {
-			ncurs := []Range{}
+			ncurs := []utils.Range{}
 			for _, cur := range curs {
 				nparts := phase.transform(cur)
 				ncurs = append(ncurs, nparts...)
@@ -199,8 +153,8 @@ func Solution() int {
 		}
 
 		for _, loc := range curs {
-			if loc.start < res {
-				res = loc.start
+			if loc.Start() < res {
+				res = loc.Start()
 			}
 		}
 	}
