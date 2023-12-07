@@ -169,63 +169,47 @@ func parseHand(line string) (Hand, error) {
 		res.powerJ = FOUR
 	}
 
-	// try all possibilities, can't be bothered to find nicer rules as it's
-	// going to be at most 9 attempts (both Js can take any of the values for
-	// the other cards)
 	if jcount == 2 {
-		// we are ignoring all cases where we keep a J as is because if we
-		// change only one J we can always trivially improve the power by
-		// changing the other J to the same card
-
-		// we're going to use this map for potential J values
-		tmpCounts := map[rune]int{}
-		for card, count := range counts {
-			if card == 'J' {
-				continue
-			}
-			tmpCounts[card] = count
+		// XXXJJ -> XXXXX
+		if res.power == FULL {
+			res.powerJ = FIVE
 		}
 
-		for cardo, _ := range counts {
-			if cardo == 'J' {
-				continue
-			}
-			tmpCounts[cardo] += 1
-			for cardi, _ := range counts {
-				if cardi == 'J' {
-					continue
-				}
-				tmpCounts[cardi] += 1
-				nScore := handPower(tmpCounts)
-				if nScore > res.powerJ {
-					res.powerJ = nScore
-				}
-				tmpCounts[cardi] -= 1
-			}
-			tmpCounts[cardo] -= 1
+		// XXJJY -> XXXXY
+		if res.power == TWOPAIR {
+			res.powerJ = FOUR
+		}
+
+		// XYZJJ -> XYZZZ
+		if res.power == PAIR {
+			res.powerJ = THREE
 		}
 	}
 
-	// same things as for jcount == 2 but with only one loop
 	if jcount == 1 {
-		tmpCounts := map[rune]int{}
-		for card, count := range counts {
-			if card == 'J' {
-				continue
-			}
-			tmpCounts[card] = count
+		// XXXXJ -> XXXXX
+		if res.power == FOUR {
+			res.powerJ = FIVE
 		}
 
-		for card, _ := range counts {
-			if card == 'J' {
-				continue
-			}
-			tmpCounts[card] += 1
-			nScore := handPower(tmpCounts)
-			if nScore > res.powerJ {
-				res.powerJ = nScore
-			}
-			tmpCounts[card] -= 1
+		// XXXYJ -> XXXXY
+		if res.power == THREE {
+			res.powerJ = FOUR
+		}
+
+		// XXYYJ -> XXYYY
+		if res.power == TWOPAIR {
+			res.powerJ = FULL
+		}
+
+		// XXYZJ -> XXXYZ
+		if res.power == PAIR {
+			res.powerJ = THREE
+		}
+
+		// WXYZJ -> WXYZZ
+		if res.power == HIGH {
+			res.powerJ = PAIR
 		}
 	}
 
