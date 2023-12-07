@@ -148,69 +148,35 @@ func parseHand(line string) (Hand, error) {
 	}
 
 	res.power = handPower(counts)
-	res.powerJ = res.power
 
 	jcount := counts['J']
 
-	// if we have 5 Js it's obviously a 5 of a kind situation
-	// if we have 4 Js they can take the value of the last card and give a 5 of
-	// a kind
 	if jcount == 5 || jcount == 4 {
+		// if we have 5 Js it's obviously a 5 of a kind situation
+		// if we have 4 Js they can take the value of the last card and give a 5 of
+		// a kind
 		res.powerJ = FIVE
-	}
-
-	// XXJJJ becomes XXXXX if J=X
-	if jcount == 3 && len(counts) == 2 {
+	} else if jcount == 3 && len(counts) == 2 {
+		// XXJJJ becomes XXXXX if J=X
 		res.powerJ = FIVE
-	}
-
-	// XYJJJ can become XYYYY or YXXXX but cannot do a 5 of a kind
-	if jcount == 3 && len(counts) == 3 {
+	} else if jcount == 3 && len(counts) == 3 {
+		// XYJJJ can become XYYYY or YXXXX but cannot do a 5 of a kind
 		res.powerJ = FOUR
-	}
+	} else {
 
-	if jcount == 2 {
-		// XXXJJ -> XXXXX
-		if res.power == FULL {
-			res.powerJ = FIVE
+		counts['J'] = 0
+		maxCard := 'J' // some other card will be max since cound of J is now 0
+		maxCount := 0
+
+		for card, count := range counts {
+			if count > maxCount {
+				maxCount = count
+				maxCard = card
+			}
 		}
 
-		// XXJJY -> XXXXY
-		if res.power == TWOPAIR {
-			res.powerJ = FOUR
-		}
-
-		// XYZJJ -> XYZZZ
-		if res.power == PAIR {
-			res.powerJ = THREE
-		}
-	}
-
-	if jcount == 1 {
-		// XXXXJ -> XXXXX
-		if res.power == FOUR {
-			res.powerJ = FIVE
-		}
-
-		// XXXYJ -> XXXXY
-		if res.power == THREE {
-			res.powerJ = FOUR
-		}
-
-		// XXYYJ -> XXYYY
-		if res.power == TWOPAIR {
-			res.powerJ = FULL
-		}
-
-		// XXYZJ -> XXXYZ
-		if res.power == PAIR {
-			res.powerJ = THREE
-		}
-
-		// WXYZJ -> WXYZZ
-		if res.power == HIGH {
-			res.powerJ = PAIR
-		}
+		counts[maxCard] += jcount
+		res.powerJ = handPower(counts)
 	}
 
 	return res, nil
