@@ -220,5 +220,20 @@ func Solution() int {
 	}
 	fmt.Printf("Part 2: %d\n", count)
 
+	// solution based on: https://www.reddit.com/r/adventofcode/comments/18ez5jb/2023_day_10_part_2_shortcut_solution_using_shape/
+	// this happens to work because of how the input has been generated
+	quarterX := (g.MaxX() + 1) / 4
+	quarterY := (g.MaxY() + 1) / 4
+	countEZ := 0
+	for x := quarterX; x <= 3*quarterX; x++ {
+		for y := quarterY; y <= 3*quarterY; y++ {
+			if loop.Contains(grid.Point{x, y}) {
+				continue
+			}
+			countEZ += 1
+		}
+	}
+	fmt.Println("If this works...", countEZ)
+
 	return 0
 }
