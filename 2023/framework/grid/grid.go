@@ -74,6 +74,10 @@ func (g *Grid[T]) Get(x, y int) *T {
 	return &g.grid[x][y]
 }
 
+func (g *Grid[T]) Set(x, y int, val T) {
+	g.grid[x][y] = val
+}
+
 func (g *Grid[T]) Neighbours(x int, y int) []Point {
 	res := []Point{}
 	if g.h == 0 || g.w == 0 {
@@ -218,6 +222,13 @@ func (g Grid[T]) Columns() [][]*T {
 
 func Convert[T any, S any](g Grid[T], conv func(T, int, int) (S, error)) (Grid[S], error) {
 	return NewGrid[S, T](g.RowsCopy(), conv)
+}
+
+func Copy[T any](g Grid[T]) Grid[T] {
+	ng, _ := NewGrid[T, T](g.RowsCopy(), func(elm T, x, y int) (T, error) {
+		return elm, nil
+	})
+	return ng
 }
 
 func (g Grid[T]) String() string {

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/jrabasco/aoc/2023/day1"
+	"github.com/jrabasco/aoc/2023/day10"
 	"github.com/jrabasco/aoc/2023/day2"
 	"github.com/jrabasco/aoc/2023/day3"
 	"github.com/jrabasco/aoc/2023/day4"
@@ -19,15 +20,16 @@ import (
 type Commands map[string]func() int
 
 var cmds = Commands{
-	"day1": day1.Solution,
-	"day2": day2.Solution,
-	"day3": day3.Solution,
-	"day4": day4.Solution,
-	"day5": day5.Solution,
-	"day6": day6.Solution,
-	"day7": day7.Solution,
-	"day8": day8.Solution,
-	"day9": day9.Solution,
+	"day1":  day1.Solution,
+	"day2":  day2.Solution,
+	"day3":  day3.Solution,
+	"day4":  day4.Solution,
+	"day5":  day5.Solution,
+	"day6":  day6.Solution,
+	"day7":  day7.Solution,
+	"day8":  day8.Solution,
+	"day9":  day9.Solution,
+	"day10": day10.Solution,
 }
 
 var tests = Commands{
