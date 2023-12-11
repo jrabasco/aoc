@@ -28,3 +28,15 @@ func LCM(integers ...int) int {
 
 	return result
 }
+
+func Abs(x int) int {
+	return AbsDiff(x, 0)
+}
+
+func AbsDiff(x, y int) int {
+	if x < y {
+		return y - x
+	}
+
+	return x - y
+}
