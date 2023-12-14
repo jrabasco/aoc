@@ -72,17 +72,13 @@ func getPart(g *grid.Grid[rune], i, j int, parts *Parts) (int, int, bool) {
 func Solution() int {
 	parsed, err := parse.GetLinesAs[[]rune]("day3/input.txt",
 		func(s string) ([]rune, error) {
-			res := []rune{}
-			for _, r := range s {
-				res = append(res, r)
-			}
-			return res, nil
+			return []rune(s), nil
 		})
 	if err != nil {
 		fmt.Printf("Failed to parse input : %v\n", err)
 		return 1
 	}
-	g, _ := grid.NewGrid[rune, rune](parsed, func(c rune, x, y int) (rune, error) { return c, nil })
+	g := grid.NewGrid[rune](parsed)
 	res1 := 0
 	parts := Parts{}
 	for i := 0; i <= g.MaxX(); i++ {

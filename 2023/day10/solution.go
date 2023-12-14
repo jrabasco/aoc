@@ -148,7 +148,7 @@ func Solution() int {
 	}
 
 	var sPos grid.Point
-	g, _ := grid.NewGrid[rune, rune](parsed, func(c rune, x, y int) (rune, error) {
+	g, _ := grid.NewGridAs[rune, rune](parsed, func(c rune, x, y int) (rune, error) {
 		if c == 'S' {
 			sPos = grid.Point{x, y}
 		}

@@ -19,7 +19,14 @@ type Grid[T any] struct {
 	maxY int
 }
 
-func NewGrid[T any, S any](lines [][]S, conv func(S, int, int) (T, error)) (Grid[T], error) {
+func NewGrid[T any](lines [][]T) Grid[T] {
+	g, _ := NewGridAs[T, T](lines, func(elm T, x, y int) (T, error) {
+		return elm, nil
+	})
+	return g
+}
+
+func NewGridAs[T any, S any](lines [][]S, conv func(S, int, int) (T, error)) (Grid[T], error) {
 	var empty Grid[T]
 	var grid [][]T
 	h := 0
@@ -221,14 +228,11 @@ func (g Grid[T]) Columns() [][]*T {
 }
 
 func Convert[T any, S any](g Grid[T], conv func(T, int, int) (S, error)) (Grid[S], error) {
-	return NewGrid[S, T](g.RowsCopy(), conv)
+	return NewGridAs[S, T](g.RowsCopy(), conv)
 }
 
 func Copy[T any](g Grid[T]) Grid[T] {
-	ng, _ := NewGrid[T, T](g.RowsCopy(), func(elm T, x, y int) (T, error) {
-		return elm, nil
-	})
-	return ng
+	return NewGrid[T](g.RowsCopy())
 }
 
 func (g Grid[T]) String() string {
@@ -247,12 +251,12 @@ func BasicTest() int {
 		[]string{"4", "5", "6"},
 		[]string{"7", "8", "9"},
 	}
-	g, _ := NewGrid[int, string](lines, func(s string, x, y int) (int, error) {
+	g, _ := NewGridAs[int, string](lines, func(s string, x, y int) (int, error) {
 		e, err := strconv.Atoi(s)
 		return e, err
 	})
 	// no error can be returned since the conv function doesn't error
-	t, _ := NewGrid[int, *int](g.Columns(), func(e *int, x, y int) (int, error) { return *e, nil })
+	t, _ := NewGridAs[int, *int](g.Columns(), func(e *int, x, y int) (int, error) { return *e, nil })
 	fmt.Println(g)
 	fmt.Println("-------")
 	fmt.Println(t)
