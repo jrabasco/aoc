@@ -13,28 +13,9 @@ type Dir struct {
 }
 
 var NORTH = Dir{true, 1}
-
-func shiftNorth(g *grid.Grid[rune]) {
-	shift(g, NORTH)
-}
-
 var WEST = Dir{false, 1}
-
-func shiftWest(g *grid.Grid[rune]) {
-	shift(g, WEST)
-}
-
 var SOUTH = Dir{true, -1}
-
-func shiftSouth(g *grid.Grid[rune]) {
-	shift(g, SOUTH)
-}
-
 var EAST = Dir{false, -1}
-
-func shiftEast(g *grid.Grid[rune]) {
-	shift(g, EAST)
-}
 
 func shift(g *grid.Grid[rune], dir Dir) {
 	var slices [][]*rune
@@ -170,7 +151,7 @@ func Solution() int {
 		score := mp.cycle()
 		state := mp.state()
 		for i, st := range states {
-			if len(state.Intersect(st)) == len(state) {
+			if state.Equal(st) {
 				found = true
 				cycleStart = i
 				break

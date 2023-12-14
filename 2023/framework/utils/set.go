@@ -44,6 +44,18 @@ func (s Set[T]) Intersect(other Set[T]) Set[T] {
 	return res
 }
 
+func (s Set[T]) Equal(other Set[T]) bool {
+	if len(s) != len(other) {
+		return false
+	}
+	for elm := range s {
+		if !other.Contains(elm) {
+			return false
+		}
+	}
+	return true
+}
+
 func (s Set[T]) Peek() T {
 	for elm := range s {
 		return elm
