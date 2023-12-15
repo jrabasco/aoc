@@ -8,7 +8,7 @@ import (
 func Solution() int {
 	parsed, err := parse.GetLines("dayX/input_test.txt")
 	if err != nil {
-		fmt.Printf("Failed to parse input : %v\n", err)
+		fmt.Printf("Failed to parse input: %v\n", err)
 		return 1
 	}
 	fmt.Printf("Part 1: %v\n", parsed)
