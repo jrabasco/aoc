@@ -18,8 +18,14 @@ profile-day$1: format build
 	go tool pprof aoc2023 aoc2023.prof
 endef
 
+define make-day-time-target
+time-day$1: format build
+	./aoc2023 -day $1 -time
+endef
+
 $(foreach element,$(LIST),$(eval $(call make-day-target,$(element))))
 $(foreach element,$(LIST),$(eval $(call make-day-profile-target,$(element))))
+$(foreach element,$(LIST),$(eval $(call make-day-time-target,$(element))))
 
 run: format build
 	./aoc2023

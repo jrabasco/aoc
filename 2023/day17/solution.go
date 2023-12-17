@@ -17,16 +17,26 @@ func bfs(g grid.Grid[int], maxStraight, minStraight int) int {
 		straight int
 		heatLoss int
 	}
-	type visitedEntry struct {
-		pos      grid.Point
-		dir      utils.Direction
-		straight int
-	}
+	//type visitedEntry struct {
+	//	pos      grid.Point
+	//	dir      utils.Direction
+	//	straight int
+	//}
 
 	q := utils.NewPriorityQueue[queueEntry](func(a, b queueEntry) int {
 		return a.heatLoss - b.heatLoss
 	})
-	visited := map[visitedEntry]int{}
+	// try without a map since profiler says map is main cost
+	visited := [][][][]int{}
+	for i := 0; i < g.H(); i++ {
+		visited = append(visited, [][][]int{})
+		for j := 0; j < g.W(); j++ {
+			visited[i] = append(visited[i], [][]int{})
+			for d := 0; d < 4; d++ {
+				visited[i][j] = append(visited[i][j], make([]int, maxStraight))
+			}
+		}
+	}
 	q.Enqueue(queueEntry{
 		pos:      grid.Point{0, 1},
 		straight: 1,
@@ -52,14 +62,13 @@ func bfs(g grid.Grid[int], maxStraight, minStraight int) int {
 			return heat
 		}
 
-		ve := visitedEntry{pos: cur.pos, dir: cur.dir, straight: cur.straight}
-		if v, exists := visited[ve]; exists {
+		if v := visited[cur.pos.X][cur.pos.Y][cur.dir][cur.straight-1]; v != 0 {
 			// already found a better path to get there
 			if v <= heat {
 				continue
 			}
 		}
-		visited[ve] = heat
+		visited[cur.pos.X][cur.pos.Y][cur.dir][cur.straight-1] = heat
 
 		if cur.straight >= minStraight {
 			left := cur.dir.Turn(utils.LEFT)
