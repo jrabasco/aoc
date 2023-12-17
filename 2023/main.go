@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/jrabasco/aoc/2023/day1"
 	"github.com/jrabasco/aoc/2023/day10"
@@ -10,6 +11,7 @@ import (
 	"github.com/jrabasco/aoc/2023/day14"
 	"github.com/jrabasco/aoc/2023/day15"
 	"github.com/jrabasco/aoc/2023/day16"
+	"github.com/jrabasco/aoc/2023/day17"
 	"github.com/jrabasco/aoc/2023/day2"
 	"github.com/jrabasco/aoc/2023/day3"
 	"github.com/jrabasco/aoc/2023/day4"
@@ -21,6 +23,7 @@ import (
 	"github.com/jrabasco/aoc/2023/framework/grid"
 	"github.com/jrabasco/aoc/2023/framework/utils"
 	"os"
+	"runtime/pprof"
 )
 
 type Commands map[string]func() int
@@ -42,6 +45,7 @@ var cmds = Commands{
 	"day14": day14.Solution,
 	"day15": day15.Solution,
 	"day16": day16.Solution,
+	"day17": day17.Solution,
 }
 
 var tests = Commands{
@@ -53,14 +57,21 @@ var tests = Commands{
 }
 
 func main() {
-	cmd := "all"
-	if len(os.Args) < 2 {
-		fmt.Println("Running all solutions...")
-	} else {
-		cmd = os.Args[1]
+	var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
+	var day = flag.Int("day", 0, "run solution for one day, default to all when not specified")
+	var test = flag.Bool("test", false, "run all tests (supercedes -day)")
+	flag.Parse()
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			fmt.Printf("could not create profile file: %v\n", err)
+			os.Exit(1)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
 	}
 
-	if cmd == "test" {
+	if *test {
 		first := true
 		for name, t := range tests {
 			if !first {
@@ -75,7 +86,7 @@ func main() {
 			first = false
 			fmt.Println("OK")
 		}
-	} else if cmd == "all" {
+	} else if *day == 0 {
 		first := true
 		for day, sol := range cmds {
 			if !first {
@@ -89,10 +100,13 @@ func main() {
 			}
 			first = false
 		}
-	} else if fn, ok := cmds[cmd]; ok {
-		os.Exit(fn())
+	} else if fn, ok := cmds[fmt.Sprintf("day%d", *day)]; ok {
+		retVal := fn()
+		if retVal != 0 {
+			os.Exit(retVal)
+		}
 	} else {
-		fmt.Printf("Invalid day or test: %s\n", cmd)
+		fmt.Printf("Invalid day or test: %s\n", *day)
 		os.Exit(1)
 	}
 }

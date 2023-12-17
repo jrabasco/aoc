@@ -2,6 +2,7 @@ package grid
 
 import (
 	"fmt"
+	"github.com/jrabasco/aoc/2023/framework/utils"
 	"strconv"
 	"strings"
 )
@@ -9,6 +10,21 @@ import (
 type Point struct {
 	X int
 	Y int
+}
+
+func (p Point) Move(d utils.Direction, qty int) Point {
+	switch d {
+	case utils.RIGHT:
+		return Point{p.X, p.Y + qty}
+	case utils.DOWN:
+		return Point{p.X + qty, p.Y}
+	case utils.LEFT:
+		return Point{p.X, p.Y - qty}
+	case utils.UP:
+		return Point{p.X - qty, p.Y}
+	default:
+		panic("impossible")
+	}
 }
 
 type Grid[T any] struct {
@@ -79,6 +95,14 @@ func (g *Grid[T]) MaxY() int {
 
 func (g *Grid[T]) Get(x, y int) *T {
 	return &g.grid[x][y]
+}
+
+func (g *Grid[T]) GetAt(p Point) *T {
+	return &g.grid[p.X][p.Y]
+}
+
+func (g *Grid[T]) Inbound(p Point) bool {
+	return p.X >= 0 && p.X <= g.maxX && p.Y >= 0 && p.Y <= g.maxY
 }
 
 func (g *Grid[T]) Set(x, y int, val T) {
@@ -218,7 +242,6 @@ func (g Grid[T]) Column(y int) []*T {
 	}
 	return res
 }
-
 func (g Grid[T]) Columns() [][]*T {
 	res := [][]*T{}
 	for y := 0; y <= g.maxY; y++ {
