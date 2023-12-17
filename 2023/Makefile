@@ -12,3 +12,6 @@ run: format build
 init:
 	cp -r tmpl day$(ARGS)
 	sed -i '' -e 's/X/$(ARGS)/g' day$(ARGS)/solution.go
+
+test: format build
+	./aoc2023 test

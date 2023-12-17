@@ -7,15 +7,6 @@ import (
 	"github.com/jrabasco/aoc/2023/framework/utils"
 )
 
-type Direction int
-
-const (
-	RIGHT Direction = iota
-	DOWN
-	LEFT
-	UP
-)
-
 type Tile struct {
 	visited []bool
 	val     rune
@@ -81,10 +72,10 @@ func reset(g *grid.Grid[Tile]) {
 type Beam struct {
 	i   int
 	j   int
-	dir Direction
+	dir utils.Direction
 }
 
-func followBeams(g *grid.Grid[Tile], direction Direction, i, j int) {
+func followBeams(g *grid.Grid[Tile], direction utils.Direction, i, j int) {
 	beams := utils.NewQueue[Beam]()
 	beams.Enqueue(Beam{i, j, direction})
 	for !beams.Empty() {
@@ -97,74 +88,74 @@ func followBeams(g *grid.Grid[Tile], direction Direction, i, j int) {
 				continue
 			}
 			tile.visited[beam.dir] = true
-			if beam.dir == RIGHT {
+			if beam.dir == utils.RIGHT {
 				if tile.val == '/' {
-					beams.Enqueue(Beam{bi - 1, bj, UP})
+					beams.Enqueue(Beam{bi - 1, bj, utils.UP})
 					continue
 				}
 
 				if tile.val == '\\' {
-					beams.Enqueue(Beam{bi + 1, bj, DOWN})
+					beams.Enqueue(Beam{bi + 1, bj, utils.DOWN})
 					continue
 				}
 
 				if tile.val == '|' {
-					beams.Enqueue(Beam{bi - 1, bj, UP})
-					beams.Enqueue(Beam{bi + 1, bj, DOWN})
+					beams.Enqueue(Beam{bi - 1, bj, utils.UP})
+					beams.Enqueue(Beam{bi + 1, bj, utils.DOWN})
 					continue
 				}
-				beams.Enqueue(Beam{bi, bj + 1, RIGHT})
-			} else if beam.dir == LEFT {
+				beams.Enqueue(Beam{bi, bj + 1, utils.RIGHT})
+			} else if beam.dir == utils.LEFT {
 				if tile.val == '/' {
-					beams.Enqueue(Beam{bi + 1, bj, DOWN})
+					beams.Enqueue(Beam{bi + 1, bj, utils.DOWN})
 					continue
 				}
 
 				if tile.val == '\\' {
-					beams.Enqueue(Beam{bi - 1, bj, UP})
+					beams.Enqueue(Beam{bi - 1, bj, utils.UP})
 					continue
 				}
 
 				if tile.val == '|' {
-					beams.Enqueue(Beam{bi - 1, bj, UP})
-					beams.Enqueue(Beam{bi + 1, bj, DOWN})
+					beams.Enqueue(Beam{bi - 1, bj, utils.UP})
+					beams.Enqueue(Beam{bi + 1, bj, utils.DOWN})
 					continue
 				}
-				beams.Enqueue(Beam{bi, bj - 1, LEFT})
-			} else if beam.dir == DOWN {
+				beams.Enqueue(Beam{bi, bj - 1, utils.LEFT})
+			} else if beam.dir == utils.DOWN {
 				if tile.val == '/' {
-					beams.Enqueue(Beam{bi, bj - 1, LEFT})
+					beams.Enqueue(Beam{bi, bj - 1, utils.LEFT})
 					continue
 				}
 
 				if tile.val == '\\' {
-					beams.Enqueue(Beam{bi, bj + 1, RIGHT})
+					beams.Enqueue(Beam{bi, bj + 1, utils.RIGHT})
 					continue
 				}
 
 				if tile.val == '-' {
-					beams.Enqueue(Beam{bi, bj - 1, LEFT})
-					beams.Enqueue(Beam{bi, bj + 1, RIGHT})
+					beams.Enqueue(Beam{bi, bj - 1, utils.LEFT})
+					beams.Enqueue(Beam{bi, bj + 1, utils.RIGHT})
 					continue
 				}
-				beams.Enqueue(Beam{bi + 1, bj, DOWN})
-			} else if beam.dir == UP {
+				beams.Enqueue(Beam{bi + 1, bj, utils.DOWN})
+			} else if beam.dir == utils.UP {
 				if tile.val == '/' {
-					beams.Enqueue(Beam{bi, bj + 1, RIGHT})
+					beams.Enqueue(Beam{bi, bj + 1, utils.RIGHT})
 					continue
 				}
 
 				if tile.val == '\\' {
-					beams.Enqueue(Beam{bi, bj - 1, LEFT})
+					beams.Enqueue(Beam{bi, bj - 1, utils.LEFT})
 					continue
 				}
 
 				if tile.val == '-' {
-					beams.Enqueue(Beam{bi, bj - 1, LEFT})
-					beams.Enqueue(Beam{bi, bj + 1, RIGHT})
+					beams.Enqueue(Beam{bi, bj - 1, utils.LEFT})
+					beams.Enqueue(Beam{bi, bj + 1, utils.RIGHT})
 					continue
 				}
-				beams.Enqueue(Beam{bi - 1, bj, UP})
+				beams.Enqueue(Beam{bi - 1, bj, utils.UP})
 			}
 		}
 	}
@@ -179,7 +170,7 @@ func Solution() int {
 		return 1
 	}
 	g := parseGrid(parsed)
-	followBeams(&g, RIGHT, 0, 0)
+	followBeams(&g, utils.RIGHT, 0, 0)
 	fmt.Printf("Part 1: %d\n", energy(g))
 
 	res2 := 0
@@ -192,22 +183,22 @@ func Solution() int {
 
 			if i == 0 {
 				reset(&g)
-				followBeams(&g, DOWN, i, j)
+				followBeams(&g, utils.DOWN, i, j)
 				res2 = max(res2, energy(g))
 			}
 			if i == g.MaxX() {
 				reset(&g)
-				followBeams(&g, UP, i, j)
+				followBeams(&g, utils.UP, i, j)
 				res2 = max(res2, energy(g))
 			}
 			if j == 0 {
 				reset(&g)
-				followBeams(&g, RIGHT, i, j)
+				followBeams(&g, utils.RIGHT, i, j)
 				res2 = max(res2, energy(g))
 			}
 			if j == g.MaxY() {
 				reset(&g)
-				followBeams(&g, LEFT, i, j)
+				followBeams(&g, utils.LEFT, i, j)
 				res2 = max(res2, energy(g))
 			}
 		}

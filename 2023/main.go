@@ -45,9 +45,11 @@ var cmds = Commands{
 }
 
 var tests = Commands{
-	"grid":  grid.BasicTest,
-	"stack": utils.TestStack,
-	"queue": utils.TestQueue,
+	"grid":   grid.BasicTest,
+	"stack":  utils.TestStack,
+	"queue":  utils.TestQueue,
+	"pqueue": utils.TestPriorityQueue,
+	"heap":   utils.TestHeap,
 }
 
 func main() {
