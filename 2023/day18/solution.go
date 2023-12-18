@@ -79,14 +79,17 @@ func parseInstruction(line string) (Instruction, error) {
 	return inst, nil
 }
 
-// Why this works is a bit perplexing... If you search for "area of a
-// polygon from its coordinates" you will find what's called the
-// "Shoelace formula" : https://www.mathopenref.com/coordpolygonarea.html.
-// Using that formula results in finding something that's basically missing
-// half of the border. This is because we have a border of non-negligible
-// size and the formula ends up "excluding" the bits that are on the
-// outside but not facing the origin. Adding a correction of border/2 + 1
-// fixes that.
+// Credits to this video for helping me understand why this work better than my
+// broken intuition: https://www.youtube.com/watch?v=nz8YxWVj-wI
+// Pick's theorem tells us that: Area = i + b/2 - 1 where i is number of points
+// of the discrete grid that are inside the polygon and b is the number of 
+// points on the discrete grid that are on the boundary of our polygon.
+// The Area is given by the shoelace formula
+// (https://www.mathopenref.com/coordpolygonarea.html). The number of boundary
+// points is the size of our perimeter
+// We want to know i + b (interior + boundary points). Solving the above
+// equation for i+b gives:
+// Area + b/2 +1 = i+b
 func area(insts []Instruction) int {
 	cur := grid.Point{0, 0}
 	doubleArea := 0
