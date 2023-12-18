@@ -35,35 +35,51 @@ func (g SparseGrid[T]) MinY() int {
 	return g.minY
 }
 
-func (g SparseGrid[T]) Get(x, y int) T {
-	if r, ok := g.grid[Point{x, y}]; ok {
+func (g SparseGrid[T]) GetP(p Point) T {
+	if r, ok := g.grid[p]; ok {
 		return r
 	}
 	return g.empty
 }
 
+func (g SparseGrid[T]) Get(x, y int) T {
+	return g.GetP(Point{x, y})
+}
+
+func (g *SparseGrid[T]) AddP(p Point, r T) {
+	if p.X > g.maxX {
+		g.maxX = p.X
+	}
+
+	if p.X < g.minX {
+		g.minX = p.X
+	}
+
+	if p.Y > g.maxY {
+		g.maxY = p.Y
+	}
+
+	if p.Y < g.minY {
+		g.minY = p.Y
+	}
+
+	g.grid[p] = r
+}
+
 func (g *SparseGrid[T]) Add(x, y int, r T) {
-	if x > g.maxX {
-		g.maxX = x
-	}
+	g.AddP(Point{x, y}, r)
+}
 
-	if x < g.minX {
-		g.minX = x
+func (g *SparseGrid[T]) MaybeAddP(p Point, r T) {
+	if g.GetP(p) == g.empty {
+		g.AddP(p, r)
 	}
-
-	if y > g.maxY {
-		g.maxY = y
-	}
-
-	if y < g.minY {
-		g.minY = y
-	}
-
-	g.grid[Point{x, y}] = r
 }
 
 func (g *SparseGrid[T]) MaybeAdd(x, y int, r T) {
-	if g.Get(x, y) == g.empty {
-		g.Add(x, y, r)
-	}
+	g.MaybeAddP(Point{x, y}, r)
+}
+
+func (g SparseGrid[T]) EmptyVal() T {
+	return g.empty
 }

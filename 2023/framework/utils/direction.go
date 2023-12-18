@@ -7,6 +7,7 @@ const (
 	DOWN
 	LEFT
 	UP
+	NODIR
 )
 
 func (d Direction) Reverse() Direction {
@@ -20,7 +21,7 @@ func (d Direction) Reverse() Direction {
 	case UP:
 		return DOWN
 	default:
-		panic("impossible")
+		return NODIR
 	}
 }
 
@@ -59,7 +60,7 @@ func (d Direction) Turn(to Direction) Direction {
 			return UP
 		}
 	}
-	panic("impossible")
+	return NODIR
 }
 
 func (d Direction) String() string {
@@ -73,6 +74,6 @@ func (d Direction) String() string {
 	case UP:
 		return "up"
 	default:
-		panic("impossible")
+		return "meh"
 	}
 }

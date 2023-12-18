@@ -22,6 +22,8 @@ func (p Point) Move(d utils.Direction, qty int) Point {
 		return Point{p.X, p.Y - qty}
 	case utils.UP:
 		return Point{p.X - qty, p.Y}
+	case utils.NODIR:
+		return p
 	default:
 		panic("impossible")
 	}
