@@ -66,3 +66,16 @@ func (r Range) Split(other Range) (Range, []Range) {
 	res = append(res, other)
 	return EmptyRange, res
 }
+
+// inclusive ranges
+func (r Range) Len() int {
+	return r.end - r.start + 1
+}
+
+func (r *Range) MoveStart(start int) {
+	r.start = start
+}
+
+func (r *Range) MoveEnd(end int) {
+	r.end = end
+}

@@ -82,7 +82,7 @@ func parseInstruction(line string) (Instruction, error) {
 // Credits to this video for helping me understand why this work better than my
 // broken intuition: https://www.youtube.com/watch?v=nz8YxWVj-wI
 // Pick's theorem tells us that: Area = i + b/2 - 1 where i is number of points
-// of the discrete grid that are inside the polygon and b is the number of 
+// of the discrete grid that are inside the polygon and b is the number of
 // points on the discrete grid that are on the boundary of our polygon.
 // The Area is given by the shoelace formula
 // (https://www.mathopenref.com/coordpolygonarea.html). The number of boundary
