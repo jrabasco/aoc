@@ -14,8 +14,8 @@ func (q Queue[T]) Empty() bool {
 	return len(q.q) == 0
 }
 
-func (q *Queue[T]) Enqueue(elm T) {
-	q.q = append(q.q, elm)
+func (q *Queue[T]) Enqueue(elms ...T) {
+	q.q = append(q.q, elms...)
 }
 
 func (q *Queue[T]) Dequeue() (T, error) {
