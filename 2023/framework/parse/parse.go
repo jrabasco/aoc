@@ -10,6 +10,10 @@ func GetLines(file string) ([]string, error) {
 	return GetLinesAs[string](file, func(s string) (string, error) { return s, nil })
 }
 
+func GetLinesAsRunes(file string) ([][]rune, error) {
+	return GetLinesAs[[]rune](file, func(s string) ([]rune, error) { return []rune(s), nil })
+}
+
 func GetLinesAsOne[T any](file string, conv func([]string) (T, error)) (T, error) {
 	lines, err := GetLines(file)
 	if err != nil {

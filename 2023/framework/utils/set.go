@@ -9,14 +9,20 @@ type Set[T comparable] map[T]struct{}
 
 var member struct{}
 
+func NewSet[T comparable]() Set[T] {
+	return Set[T]{}
+}
+
 func SetFromSlice[T comparable](slice []T) Set[T] {
 	set := Set[T]{}
 	set.AddSlice(slice)
 	return set
 }
 
-func (s *Set[T]) Add(elm T) {
-	(*s)[elm] = member
+func (s *Set[T]) Add(elms ...T) {
+	for _, elm := range elms {
+		(*s)[elm] = member
+	}
 }
 
 func (s *Set[T]) AddSlice(slice []T) {
