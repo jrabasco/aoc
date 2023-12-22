@@ -79,3 +79,8 @@ func (r *Range) MoveStart(start int) {
 func (r *Range) MoveEnd(end int) {
 	r.end = end
 }
+
+func (r *Range) Shift(delta int) {
+	r.start += delta
+	r.end += delta
+}
