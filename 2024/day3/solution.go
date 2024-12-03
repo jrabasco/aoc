@@ -8,157 +8,262 @@ import (
 	"unicode"
 )
 
-func nextNumber(liner []rune, idx int) (int, int) {
-	cur := liner[idx]
-	ns := ""
+type Spec string
 
-	for idx < len(liner) {
-		cur = liner[idx]
-		if !unicode.IsDigit(cur) {
-			break
-		}
-		ns += string(cur)
-		idx++
-	}
+const (
+	One Spec = "one"
+	Two Spec = "two"
+)
 
-	if len(ns) == 0 {
-		return 0, -1
-	}
-
-	res, _ := strconv.Atoi(ns)
-	return res, idx
+type FSM struct {
+	spec  Spec
+	state State
+	on    bool
+	n1s   string
+	n1    int
+	n2s   string
+	n2    int
+	res   int
 }
 
-func nextMul1(line string) (int, int) {
-	found := false
-	res := 0
-	idx := 0
-	for idx < len(line) && !found {
-		nidx := strings.Index(line[idx:], "mul(")
-		if nidx < 0 {
-			return 0, -1
-		}
-		idx += nidx
-		if idx+4 >= len(line) {
-			return 0, -1
-		}
-		liner := []rune(line)
-		n1, n1idx := nextNumber(liner, idx+4)
-		if n1idx >= 0 {
-			idx = n1idx
-		}
-
-		if idx >= len(line) || idx < 0 || liner[idx] != ',' {
-			continue
-		}
-
-		n2, n2idx := nextNumber(liner, idx+1)
-		if n2idx >= 0 {
-			idx = n2idx
-		}
-
-		if idx >= len(line) || idx < 0 || liner[idx] != ')' {
-			continue
-		}
-
-		found = true
-		res = n1 * n2
-	}
-
-	if found {
-		return res, idx
-	} else {
-		return 0, -1
-	}
+func NewFSM(spec Spec) *FSM {
+	return &FSM{spec, Wait{}, true, "", 0, "", 0, 0}
 }
 
-func nextMul2(line string) (int, int) {
-	found := false
-	res := 0
-	idx := 0
-	for idx < len(line) && !found {
-		mulidx := strings.Index(line[idx:], "mul(")
-		if mulidx < 0 {
-			return 0, -1
-		}
-		dontidx := strings.Index(line[idx:], "don't()")
+type State interface {
+	processEvent(*FSM, rune) State
+}
 
-		if dontidx >= 0 && dontidx < mulidx {
-			idx += dontidx
-			doidx := strings.Index(line[idx:], "do()")
-			if doidx < 0 {
-				break
-			}
-			idx += doidx
-			continue
-		}
+type Wait struct{}
 
-		idx += mulidx
-		if idx+4 >= len(line) {
-			return 0, -1
-		}
-		liner := []rune(line)
-		n1, n1idx := nextNumber(liner, idx+4)
-		if n1idx >= 0 {
-			idx = n1idx
-		}
-
-		if idx >= len(line) || idx < 0 || liner[idx] != ',' {
-			continue
-		}
-
-		n2, n2idx := nextNumber(liner, idx+1)
-		if n2idx >= 0 {
-			idx = n2idx
-		}
-
-		if idx >= len(line) || idx < 0 || liner[idx] != ')' {
-			continue
-		}
-
-		found = true
-		res = n1 * n2
+func (s Wait) processEvent(fsm *FSM, c rune) State {
+	fsm.n1s = ""
+	fsm.n2s = ""
+	fsm.n1 = 0
+	fsm.n2 = 0
+	if c == 'm' && fsm.on {
+		return M{}
 	}
 
-	if found {
-		return res, idx
-	} else {
-		return 0, -1
+	if c == 'd' && fsm.spec == Two {
+		return D{}
 	}
+
+	return Wait{}
 }
 
-func px(lines []string, nextMul func(line string) (int, int)) int {
-	res := 0
-	wline := strings.Join(lines, "-")
+type WaitOn struct{}
 
-	for {
-		nxt, idx := nextMul(wline)
-		if idx < 0 {
-			break
-		}
-		res += nxt
+func (s WaitOn) processEvent(fsm *FSM, c rune) State {
+	return Wait{}
+}
 
-		if idx >= len(wline) {
-			break
-		}
-		wline = wline[idx+1:]
+type WaitOff struct{}
+
+func (s WaitOff) processEvent(fsm *FSM, c rune) State {
+	return Wait{}
+}
+
+type M struct{}
+
+func (s M) processEvent(fsm *FSM, c rune) State {
+	if c == 'u' {
+		return U{}
 	}
-	return res
+
+	if c == 'd' && fsm.spec == Two {
+		return D{}
+	}
+	return Wait{}
 }
 
-func p1(lines []string) int {
-	return px(lines, nextMul1)
+type U struct{}
+
+func (s U) processEvent(fsm *FSM, c rune) State {
+	if c == 'l' {
+		return L{}
+	}
+
+	if c == 'd' && fsm.spec == Two {
+		return D{}
+	}
+	return Wait{}
 }
-func p2(lines []string) int {
-	return px(lines, nextMul2)
+
+type L struct{}
+
+func (s L) processEvent(fsm *FSM, c rune) State {
+	if c == '(' {
+		return MulLParen{}
+	}
+
+	if c == 'd' && fsm.spec == Two {
+		return D{}
+	}
+	return Wait{}
 }
+
+type MulLParen struct{}
+
+func (s MulLParen) processEvent(fsm *FSM, c rune) State {
+	if unicode.IsDigit(c) {
+		fsm.n1s = string(c)
+		return Digit1{}
+	}
+
+	if c == 'd' && fsm.spec == Two {
+		return D{}
+	}
+	return Wait{}
+}
+
+type Digit1 struct{}
+
+func (s Digit1) processEvent(fsm *FSM, c rune) State {
+	if unicode.IsDigit(c) {
+		fsm.n1s += string(c)
+		return Digit1{}
+	}
+
+	if c == ',' {
+		fsm.n1, _ = strconv.Atoi(fsm.n1s)
+		return Digit2{}
+	}
+
+	if c == 'd' && fsm.spec == Two {
+		return D{}
+	}
+	return Wait{}
+}
+
+type Digit2 struct{}
+
+func (s Digit2) processEvent(fsm *FSM, c rune) State {
+	if unicode.IsDigit(c) {
+		fsm.n2s += string(c)
+		return Digit2{}
+	}
+	if c == ')' && len(fsm.n2s) > 0 {
+		fsm.n2, _ = strconv.Atoi(fsm.n2s)
+		fsm.res += fsm.n1 * fsm.n2
+	}
+
+	if c == 'd' && fsm.spec == Two {
+		return D{}
+	}
+	return Wait{}
+}
+
+type D struct{}
+
+func (s D) processEvent(fsm *FSM, c rune) State {
+	if c == 'd' {
+		return D{}
+	}
+
+	if c == 'o' {
+		return O{}
+	}
+	return Wait{}
+}
+
+type O struct{}
+
+func (s O) processEvent(fsm *FSM, c rune) State {
+	if c == 'd' {
+		return D{}
+	}
+
+	if c == '(' {
+		return DoLParen{}
+	}
+
+	if c == 'n' {
+		return N{}
+	}
+	return Wait{}
+}
+
+type DoLParen struct{}
+
+func (s DoLParen) processEvent(fsm *FSM, c rune) State {
+	if c == 'd' {
+		return D{}
+	}
+
+	if c == ')' {
+		fsm.on = true
+	}
+	return Wait{}
+}
+
+type N struct{}
+
+func (s N) processEvent(fsm *FSM, c rune) State {
+	if c == 'd' {
+		return D{}
+	}
+
+	if c == '\'' {
+		return Apos{}
+	}
+
+	return Wait{}
+}
+
+type Apos struct{}
+
+func (s Apos) processEvent(fsm *FSM, c rune) State {
+	if c == 'd' {
+		return D{}
+	}
+
+	if c == 't' {
+		return T{}
+	}
+	return Wait{}
+}
+
+type T struct{}
+
+func (s T) processEvent(fsm *FSM, c rune) State {
+	if c == 'd' {
+		return D{}
+	}
+
+	if c == '(' {
+		return DontLParen{}
+	}
+	return Wait{}
+}
+
+type DontLParen struct{}
+
+func (s DontLParen) processEvent(fsm *FSM, c rune) State {
+	if c == 'd' {
+		return D{}
+	}
+	if c == ')' {
+		fsm.on = false
+	}
+	return Wait{}
+}
+
 func Solution() int {
 	parsed, err := parse.GetLines("day3/input.txt")
 	if err != nil {
 		fmt.Printf("Failed to parse input: %v\n", err)
 		return 1
 	}
-	fmt.Printf("Part 1: %d\n", p1(parsed))
-	fmt.Printf("Part 2: %d\n", p2(parsed))
+	code := strings.Join(parsed, "\n")
+
+	fsmOne := NewFSM(One)
+	fsmTwo := NewFSM(Two)
+	for _, c := range code {
+		fsmOne.state = fsmOne.state.processEvent(fsmOne, c)
+		fsmTwo.state = fsmTwo.state.processEvent(fsmTwo, c)
+	}
+	fmt.Printf("Part 1: %d\n", fsmOne.res)
+	fmt.Printf("Part 1: %d\n", fsmTwo.res)
 	return 0
 }
