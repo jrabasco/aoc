@@ -22,6 +22,14 @@ func (p Point) Move(d utils.Direction, qty int) Point {
 		return Point{p.X, p.Y - qty}
 	case utils.UP:
 		return Point{p.X - qty, p.Y}
+	case utils.UPRIGHT:
+		return Point{p.X - qty, p.Y + qty}
+	case utils.UPLEFT:
+		return Point{p.X - qty, p.Y - qty}
+	case utils.DOWNRIGHT:
+		return Point{p.X + qty, p.Y + qty}
+	case utils.DOWNLEFT:
+		return Point{p.X + qty, p.Y - qty}
 	case utils.NODIR:
 		return p
 	default:

@@ -7,8 +7,23 @@ const (
 	DOWN
 	LEFT
 	UP
+	UPRIGHT
+	UPLEFT
+	DOWNRIGHT
+	DOWNLEFT
 	NODIR
 )
+
+var ALL_DIRS []Direction = []Direction{
+	RIGHT,
+	DOWN,
+	LEFT,
+	UP,
+	UPRIGHT,
+	UPLEFT,
+	DOWNRIGHT,
+	DOWNLEFT,
+}
 
 func (d Direction) Reverse() Direction {
 	switch d {
@@ -20,6 +35,14 @@ func (d Direction) Reverse() Direction {
 		return RIGHT
 	case UP:
 		return DOWN
+	case UPRIGHT:
+		return DOWNLEFT
+	case UPLEFT:
+		return DOWNRIGHT
+	case DOWNLEFT:
+		return UPRIGHT
+	case DOWNRIGHT:
+		return UPLEFT
 	default:
 		return NODIR
 	}
@@ -73,6 +96,14 @@ func (d Direction) String() string {
 		return "left"
 	case UP:
 		return "up"
+	case UPRIGHT:
+		return "upright"
+	case UPLEFT:
+		return "upleft"
+	case DOWNRIGHT:
+		return "downright"
+	case DOWNLEFT:
+		return "downleft"
 	default:
 		return "meh"
 	}
