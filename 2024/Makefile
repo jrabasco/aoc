@@ -33,8 +33,6 @@ run: format build
 init:
 	cp -r tmpl day$(ARGS)
 	sed -i '' -e 's/X/$(ARGS)/g' day$(ARGS)/solution.go
-	. ../.env
-	curl https://adventofcode.com/2024/day/$(ARGS)/input -H 'Cookie: session=$(AOC_COOKIE)' > day$(ARGS)/input.txt
 
 test: format build
 	./aoc2024 -test

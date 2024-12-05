@@ -31,6 +31,12 @@ func (s *Set[T]) AddSlice(slice []T) {
 	}
 }
 
+func (s *Set[T]) AddSet(set Set[T]) {
+	for elm := range set {
+		s.Add(elm)
+	}
+}
+
 func (s *Set[T]) Remove(elm T) {
 	delete(*s, elm)
 }
@@ -47,6 +53,13 @@ func (s Set[T]) Intersect(other Set[T]) Set[T] {
 			res.Add(elm)
 		}
 	}
+	return res
+}
+
+func (s Set[T]) Union(other Set[T]) Set[T] {
+	res := make(Set[T])
+	res.AddSet(s)
+	res.AddSet(other)
 	return res
 }
 
