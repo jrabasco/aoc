@@ -23,16 +23,19 @@ time-day$1: format build
 	./aoc2024 -day $1 -time
 endef
 
+define make-init-day
+init-day$1:
+	cp -r tmpl day$1
+	sed -i '' -e 's/X/$1/g' day$1/solution.go
+endef
+
 $(foreach element,$(LIST),$(eval $(call make-day-target,$(element))))
 $(foreach element,$(LIST),$(eval $(call make-day-profile-target,$(element))))
 $(foreach element,$(LIST),$(eval $(call make-day-time-target,$(element))))
+$(foreach element,$(LIST),$(eval $(call make-init-day,$(element))))
 
 run: format build
 	./aoc2024
-
-init:
-	cp -r tmpl day$(ARGS)
-	sed -i '' -e 's/X/$(ARGS)/g' day$(ARGS)/solution.go
 
 test: format build
 	./aoc2024 -test

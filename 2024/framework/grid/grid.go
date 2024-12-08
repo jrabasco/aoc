@@ -37,6 +37,18 @@ func (p Point) Move(d utils.Direction, qty int) Point {
 	}
 }
 
+type Vector Point
+
+func (a *Point) MoveV(vector Vector) {
+	a.X += vector.X
+	a.Y += vector.Y
+}
+
+func (v *Vector) Reverse() {
+	v.X = -1 * v.X
+	v.Y = -1 * v.Y
+}
+
 type Grid[T any] struct {
 	grid [][]T
 	h    int

@@ -10,6 +10,7 @@ import (
 	"github.com/jrabasco/aoc/2024/day5"
 	"github.com/jrabasco/aoc/2024/day6"
 	"github.com/jrabasco/aoc/2024/day7"
+	"github.com/jrabasco/aoc/2024/day8"
 	"github.com/jrabasco/aoc/2024/framework/grid"
 	"github.com/jrabasco/aoc/2024/framework/utils"
 	"os"
@@ -27,6 +28,7 @@ var cmds = Commands{
 	"day5": day5.Solution,
 	"day6": day6.Solution,
 	"day7": day7.Solution,
+	"day8": day8.Solution,
 }
 
 var tests = Commands{
