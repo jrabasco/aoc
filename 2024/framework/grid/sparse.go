@@ -46,6 +46,15 @@ func (g SparseGrid[T]) Get(x, y int) T {
 	return g.GetP(Point{x, y})
 }
 
+func (g SparseGrid[T]) IsEmptyP(p Point) bool {
+	_, ok := g.grid[p]
+	return ok
+}
+
+func (g SparseGrid[T]) IsEmpty(x, y int) bool {
+	return g.IsEmptyP(Point{x, y})
+}
+
 func (g *SparseGrid[T]) AddP(p Point, r T) {
 	if p.X > g.maxX {
 		g.maxX = p.X
@@ -74,6 +83,14 @@ func (g *SparseGrid[T]) MaybeAddP(p Point, r T) {
 	if g.GetP(p) == g.empty {
 		g.AddP(p, r)
 	}
+}
+
+func (g *SparseGrid[T]) Remove(x, y int) {
+	g.Add(x, y, g.empty)
+}
+
+func (g *SparseGrid[T]) RemoveP(p Point) {
+	g.AddP(p, g.empty)
 }
 
 func (g *SparseGrid[T]) MaybeAdd(x, y int, r T) {

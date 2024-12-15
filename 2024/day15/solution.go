@@ -32,34 +32,28 @@ func seekEmpty(g *grid.Grid[string], start grid.Point, dir utils.Direction) int 
 
 func p1(p Problem) int {
 	cur := p.start
+	g := grid.Copy[string](p.g)
 	steps := 0
 	for _, m := range p.moves {
-		diff := seekEmpty(&p.g, cur, m)
+		diff := seekEmpty(&g, cur, m)
 		if diff == -1 {
-			//fmt.Println("Do nothing")
 			continue
 		}
 
 		empty := cur.Move(m, diff)
 		back := m.Reverse()
-		//fmt.Println("Moving things", m)
 		for i := diff; i > 0; i-- {
 			n := empty.Move(back, 1)
-			//fmt.Println("Move things from:", n, "to:", empty)
-			toMove := *p.g.GetAt(n)
-			*p.g.GetAt(empty) = toMove
+			toMove := *g.GetAt(n)
+			*g.GetAt(empty) = toMove
 			empty = n
 		}
-		*p.g.GetAt(empty) = "."
+		*g.GetAt(empty) = "."
 		steps++
 		cur = cur.Move(m, 1)
-		//if steps == 2 {
-		//	break
-		//}
-		//fmt.Println(p.g)
 	}
 	res := 0
-	for i, r := range p.g.Rows() {
+	for i, r := range g.Rows() {
 		for j, elm := range r {
 			if *elm == "O" {
 				res += 100*i + j
@@ -69,8 +63,112 @@ func p1(p Problem) int {
 	return res
 }
 
+func canMove(g *grid.SparseGrid[string], pos grid.Point, dir utils.Direction) bool {
+	npos := pos.Move(dir, 1)
+	elm := g.GetP(npos)
+	if elm == "#" {
+		return false
+	}
+
+	if elm == "[" {
+		if dir == utils.RIGHT || dir == utils.LEFT {
+			return canMove(g, npos, dir)
+		}
+
+		nposRight := grid.Point{npos.X, npos.Y + 1}
+		return canMove(g, npos, dir) && canMove(g, nposRight, dir)
+	}
+
+	if elm == "]" {
+		if dir == utils.RIGHT || dir == utils.LEFT {
+			return canMove(g, npos, dir)
+		}
+
+		nposLeft := grid.Point{npos.X, npos.Y - 1}
+		return canMove(g, npos, dir) && canMove(g, nposLeft, dir)
+	}
+
+	// then it's empty
+	return true
+}
+
+func move(g *grid.SparseGrid[string], pos grid.Point, dir utils.Direction) {
+	npos := pos.Move(dir, 1)
+	elm := g.GetP(npos)
+	if elm == "#" {
+		return
+	}
+
+	if elm == "[" {
+		if dir == utils.RIGHT || dir == utils.LEFT {
+			move(g, npos, dir)
+		} else {
+			nposRight := grid.Point{npos.X, npos.Y + 1}
+			move(g, npos, dir)
+			move(g, nposRight, dir)
+		}
+	}
+
+	if elm == "]" {
+		if dir == utils.RIGHT || dir == utils.LEFT {
+			move(g, npos, dir)
+		} else {
+			nposLeft := grid.Point{npos.X, npos.Y - 1}
+			move(g, npos, dir)
+			move(g, nposLeft, dir)
+		}
+	}
+
+	// spot has been freed
+	toMove := g.GetP(pos)
+	g.RemoveP(pos)
+	g.AddP(npos, toMove)
+}
+
 func p2(p Problem) int {
-	return 0
+	g2 := grid.NewSparseGrid[string](".")
+	var start2 grid.Point
+	for i, row := range p.g.Rows() {
+		for j, elm := range row {
+			if *elm == "#" {
+				g2.Add(i, 2*j, "#")
+				g2.Add(i, 2*j+1, "#")
+			}
+
+			if *elm == "O" {
+				g2.Add(i, 2*j, "[")
+				g2.Add(i, 2*j+1, "]")
+			}
+
+			if *elm == "@" {
+				g2.Add(i, 2*j, "@")
+				start2 = grid.Point{i, 2 * j}
+			}
+		}
+	}
+
+	for _, m := range p.moves {
+		if !canMove(&g2, start2, m) {
+			continue
+		}
+		move(&g2, start2, m)
+		start2 = start2.Move(m, 1)
+		//if i > 0 {
+		//	break
+		//}
+	}
+
+	res := 0
+	for i := 0; i <= g2.MaxX(); i++ {
+		for j := 0; j <= g2.MaxY(); j++ {
+			elm := g2.Get(i, j)
+			if elm != "[" {
+				continue
+			}
+			res += 100*i + j
+		}
+	}
+	return res
 }
 
 func parseGrid(lines []string) (Problem, error) {
