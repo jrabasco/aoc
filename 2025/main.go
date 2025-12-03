@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/jrabasco/aoc/2025/day1"
 	"github.com/jrabasco/aoc/2025/day2"
+	"github.com/jrabasco/aoc/2025/day3"
 	"github.com/jrabasco/aoc/2025/framework/grid"
 	"github.com/jrabasco/aoc/2025/framework/utils"
 	"os"
@@ -17,6 +18,7 @@ type Commands map[string]func() int
 var cmds = Commands{
 	"day1": day1.Solution,
 	"day2": day2.Solution,
+	"day3": day3.Solution,
 }
 
 var tests = Commands{
