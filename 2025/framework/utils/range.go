@@ -23,8 +23,8 @@ func NewRange(start int, end int) Range {
 	return Range{start, end}
 }
 
-func (r Range) FullyContains(other Range) bool {
-	return r.start <= other.start && other.end <= r.end
+func (r Range) FullyContains(o Range) bool {
+	return r.start <= o.start && o.end <= r.end
 }
 
 func (r Range) Contains(num int) bool {
@@ -35,35 +35,51 @@ func (r Range) Overlaps(o Range) bool {
 	return r.Contains(o.start) || r.Contains(o.end) || o.FullyContains(r)
 }
 
+func (r Range) Merge(o Range) Range {
+	if !r.Overlaps(o) {
+		panic("trying to merge non-overlapping ranges")
+	}
+	st := r.Start()
+	if r.Start() > o.Start() {
+		st = o.Start()
+	}
+
+	end := r.End()
+	if o.End() > r.End() {
+		end = o.End()
+	}
+	return NewRange(st, end)
+}
+
 // returns the range that's in r and an array of ranges outside of it
-func (r Range) Split(other Range) (Range, []Range) {
+func (r Range) Split(o Range) (Range, []Range) {
 	res := []Range{}
-	// other is fully contained
-	if r.start <= other.start && other.end <= r.end {
-		return other, res
+	// o is fully contained
+	if r.start <= o.start && o.end <= r.end {
+		return o, res
 	}
 
-	// other's beginning is contained
-	if r.start <= other.start && r.end < other.end {
-		res = append(res, Range{r.end + 1, other.end})
-		return Range{other.start, r.end}, res
+	// o's beginning is contained
+	if r.start <= o.start && r.end < o.end {
+		res = append(res, Range{r.end + 1, o.end})
+		return Range{o.start, r.end}, res
 	}
 
-	// other's end is contained
-	if other.start < r.start && other.end >= r.start && other.end <= r.end {
-		res = append(res, Range{other.start, r.start - 1})
-		return Range{r.start, other.end}, res
+	// o's end is contained
+	if o.start < r.start && o.end >= r.start && o.end <= r.end {
+		res = append(res, Range{o.start, r.start - 1})
+		return Range{r.start, o.end}, res
 	}
 
-	// other contains r
-	if other.start < r.start && r.end < other.end {
-		res = append(res, Range{other.start, r.end - 1})
-		res = append(res, Range{r.end + 1, other.end})
+	// o contains r
+	if o.start < r.start && r.end < o.end {
+		res = append(res, Range{o.start, r.end - 1})
+		res = append(res, Range{r.end + 1, o.end})
 		return Range{r.start, r.end}, res
 	}
 
 	// disjoint
-	res = append(res, other)
+	res = append(res, o)
 	return EmptyRange, res
 }
 
