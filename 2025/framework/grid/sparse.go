@@ -48,7 +48,7 @@ func (g SparseGrid[T]) Get(x, y int) T {
 
 func (g SparseGrid[T]) IsEmptyP(p Point) bool {
 	_, ok := g.grid[p]
-	return ok
+	return !ok
 }
 
 func (g SparseGrid[T]) IsEmpty(x, y int) bool {
