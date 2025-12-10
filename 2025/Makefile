@@ -1,7 +1,7 @@
 all: run
 
 build:
-	go build -o aoc2025
+	CGO_CFLAGS="-I/opt/homebrew/include" CGO_LDFLAGS="-L/opt/homebrew/lib" go build -o aoc2025
 
 format:
 	go fmt ./...
