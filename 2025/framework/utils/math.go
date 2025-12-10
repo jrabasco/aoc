@@ -55,6 +55,17 @@ func IntLen(i int) int {
 	return count
 }
 
+func BitCount(i int) int {
+	count := 0
+	for i > 0 {
+		if i%2 != 0 {
+			count += 1
+		}
+		i /= 2
+	}
+	return count
+}
+
 func IntPow(a, b int) int {
 	return int(math.Pow(float64(a), float64(b)))
 }
