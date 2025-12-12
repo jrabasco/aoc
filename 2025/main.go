@@ -3,9 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"runtime/pprof"
+	"time"
+
 	"github.com/jrabasco/aoc/2025/day1"
 	"github.com/jrabasco/aoc/2025/day10"
 	"github.com/jrabasco/aoc/2025/day11"
+	"github.com/jrabasco/aoc/2025/day12"
 	"github.com/jrabasco/aoc/2025/day2"
 	"github.com/jrabasco/aoc/2025/day3"
 	"github.com/jrabasco/aoc/2025/day4"
@@ -16,9 +21,6 @@ import (
 	"github.com/jrabasco/aoc/2025/day9"
 	"github.com/jrabasco/aoc/2025/framework/grid"
 	"github.com/jrabasco/aoc/2025/framework/utils"
-	"os"
-	"runtime/pprof"
-	"time"
 )
 
 type Commands map[string]func() int
@@ -35,6 +37,7 @@ var cmds = Commands{
 	"day9":  day9.Solution,
 	"day10": day10.Solution,
 	"day11": day11.Solution,
+	"day12": day12.Solution,
 }
 
 var tests = Commands{
